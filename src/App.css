@@ -1,0 +1,29 @@
+.page-title {
+  display: block !important;
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 10px !important;
+}
+
+.form-container {
+  width: 80%;
+  min-width: 200px;
+  margin: auto;
+}
+
+.sidebar-button i {
+  margin: 0 !important;
+}
+
+@media (max-width: 767px) {
+  .ui.container {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (min-width: 400px) {
+  .form-container {
+    width: 50%;
+  }
+}
