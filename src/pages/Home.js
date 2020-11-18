@@ -1,32 +1,55 @@
-import React from "react";
-import { useQuery } from "@apollo/react-hooks";
+import React, { useContext, useEffect, useState } from "react";
+import {  useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import PostCard from "../components/PostCard";
-import { Grid } from "semantic-ui-react";
+import { Grid, Loader, TransitionGroup } from "semantic-ui-react";
+import { AuthContext } from "../context/auth";
+import NewPost from "../forms/NewPost";
 
 const Home = (props) => {
+  const { token } = useContext(AuthContext);
+
   const { loading, data } = useQuery(FETCH_POSTS_QUERY);
 
-  let posts;
-  if (data) posts = data.getPosts;
+  const [posts, setPosts] = useState();
+
+  const deletePostHandler = (postId) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
+  const updateCommentsHandler = (post) => {};
+
+  const likePostHandler = (post) => {};
+
+  useEffect(() => {
+    if (data && data.getPosts) {
+      setPosts(data.getPosts);
+    }
+  }, [data]);
 
   return (
-    <Grid columns={1}>
-      <Grid.Row className="page-title">
-        <h1>Recent Posts</h1>
-      </Grid.Row>
-      <Grid.Row>
+    <Grid style={{ marginTop: "20px" }}>
+      <Grid.Column className="post-column">
+        {token && <NewPost setPosts={setPosts} posts={posts} />}
+
         {loading ? (
-          <h1>Loading posts...</h1>
+          <Loader active />
         ) : (
-          posts &&
-          posts.map((post) => (
-            <Grid.Column key={post.id} style={{ marginBottom: "20px" }}>
-              <PostCard post={post} />
-            </Grid.Column>
-          ))
+          <TransitionGroup>
+            {posts &&
+              posts.map((post) => (
+                <Grid.Row key={post.id} className="post-item">
+                  <PostCard
+                    post={post}
+                    deletePost={deletePostHandler}
+                    updateComments={updateCommentsHandler}
+                    likePost={likePostHandler}
+                  />
+                </Grid.Row>
+              ))}
+          </TransitionGroup>
         )}
-      </Grid.Row>
+      </Grid.Column>
     </Grid>
   );
 };
@@ -35,20 +58,24 @@ const FETCH_POSTS_QUERY = gql`
   {
     getPosts {
       id
+      type
       body
+      image
       createdAt
-      username
+      firstname
+      lastname
+      userImage
+      userId
       likeCount
       likes {
         id
-        username
+        createdAt
         firstname
         lastname
       }
       commentCount
       comments {
         id
-        username
         createdAt
         body
         firstname

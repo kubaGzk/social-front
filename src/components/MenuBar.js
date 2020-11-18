@@ -83,7 +83,12 @@ const MenuBar = (props) => {
         <Ref innerRef={dropdownMenuRef}>
           <Dropdown.Menu>
             <Dropdown.Item name="login">
-              <Button as={Link} color="teal" to="/login">
+              <Button
+                as={Link}
+                color="teal"
+                to="/login"
+                onClick={() => setDropdownOpen(false)}
+              >
                 Register/Login
               </Button>
             </Dropdown.Item>
@@ -103,7 +108,7 @@ const MenuBar = (props) => {
           />
         </Menu.Item>
         <Menu.Item name="logout" onClick={() => logout()} as={Link} to="/" />
-        <Menu.Item style={{maxWidth: "13rem"}}>
+        <Menu.Item style={{ maxWidth: "13rem" }}>
           <Label
             as="a"
             style={{
@@ -163,7 +168,10 @@ const MenuBar = (props) => {
               </Dropdown.Item>
               <Dropdown.Item
                 name="logout"
-                onClick={() => logout()}
+                onClick={() => {
+                  logout();
+                  setDropdownOpen(false);
+                }}
                 as={Link}
                 to="/"
                 style={{ textAlign: "center" }}

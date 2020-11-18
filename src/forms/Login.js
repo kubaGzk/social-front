@@ -20,11 +20,11 @@ const Login = (props) => {
     update(_, result) {
       const {
         data: {
-          login: { id, email, token, username, firstname, lastname, image },
+          login: { id, email, token, firstname, lastname, image },
         },
       } = result;
 
-      login(token, username, firstname, lastname, image, id, email);
+      login(token, firstname, lastname, image, id, email);
       props.history.push("/");
     },
 
@@ -87,7 +87,6 @@ const LOGIN_USER = gql`
       email
       firstname
       lastname
-      username
       token
       image
     }

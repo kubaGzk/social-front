@@ -26,10 +26,10 @@ const Register = (props) => {
     update(_, result) {
       const {
         data: {
-          register: { id, email, token, username, firstname, lastname, image },
+          register: { id, email, token, firstname, lastname, image },
         },
       } = result;
-      login(token, username, firstname, lastname, image, id, email);
+      login(token,  firstname, lastname, image, id, email);
       props.history.push("/");
     },
     onError(err) {
@@ -149,7 +149,6 @@ const REGISTER_USER = gql`
     ) {
       id
       email
-      username
       firstname
       lastname
       image

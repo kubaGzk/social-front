@@ -17,5 +17,10 @@ export const useForm = (callback, initialState = {}) => {
     callback();
   };
 
-  return [values, onChange, onSubmit];
+  const onClear = () => {
+    console.log("CLEARING...", initialState)
+    setValues(initialState);
+  };
+
+  return [values, onChange, onSubmit, onClear];
 };
