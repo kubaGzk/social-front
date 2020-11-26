@@ -1,6 +1,7 @@
-import { gql, useMutation } from "@apollo/react-hooks";
-import React, { useRef, useState } from "react";
-import { Card, Form, Grid, TextArea, Input, Ref } from "semantic-ui-react";
+import { useMutation } from "@apollo/react-hooks";
+import React, { useState } from "react";
+import { Card, Form, Grid, TextArea, Input } from "semantic-ui-react";
+import { CREATE_POST, FETCH_POSTS_QUERY } from "../util/graphql";
 import { useForm } from "../util/hooks";
 
 const INITIAL_STATE = { body: "", image: null };
@@ -14,16 +15,26 @@ const NewPost = (props) => {
   const [error, setError] = useState();
 
   const [submitPost, { loading }] = useMutation(CREATE_POST, {
-    update(_, { data: { createPost: postData } }) {
-      
+    update(cache, { data: { createPost: postData } }) {
+      //CLEANING FORM
       onClear();
       document.getElementById("file-uploader").value = "";
 
-      props.setPosts([postData, ...props.posts]);
+      const data = cache.readQuery({ query: FETCH_POSTS_QUERY });
+
+      cache.writeQuery({
+        query: FETCH_POSTS_QUERY,
+        data: { getPosts: [postData, ...data.getPosts] },
+      });
     },
     onError(err) {
-      console.log(err.graphQLErrors[0].message);
-      setError(err.graphQLErrors[0].message);
+      let errMsg = "Unexpected error";
+      if (err && err.graphQLErrors[0] && err.graphQLErrors[0].message)
+        errMsg = err.graphQLErrors[0].message;
+
+      console.log(errMsg, err);
+
+      setError(errMsg);
       setTimeout(() => {
         setError(null);
       }, 5000);
@@ -78,23 +89,5 @@ const NewPost = (props) => {
     </Grid.Row>
   );
 };
-
-const CREATE_POST = gql`
-  mutation createPost($body: String!, $image: Upload, $type: PostType!) {
-    createPost(body: $body, image: $image, type: $type) {
-      id
-      body
-      createdAt
-      userId
-      likeCount
-      commentCount
-      type
-      image
-      firstname
-      lastname
-      userImage
-    }
-  }
-`;
 
 export default NewPost;

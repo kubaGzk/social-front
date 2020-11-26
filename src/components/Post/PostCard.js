@@ -12,10 +12,17 @@ import {
 } from "semantic-ui-react";
 import moment from "moment";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../context/auth";
+import { AuthContext } from "../../context/auth";
 import Comments from "./Comments";
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import {
+  FETCH_POSTS_QUERY,
+  COMMENT_POST_MUTATION,
+  DELETE_COMMENT_MUTATION,
+  DELETE_POST_MUTATION,
+  LIKE_POST_MUTATION,
+} from "../../util/graphql";
+import Likes from "./Likes";
 
 const PostCard = (props) => {
   const {
@@ -34,54 +41,59 @@ const PostCard = (props) => {
       image,
       userId,
     },
-    deletePost,
-    updateComments,
-    likePost,
+    showError,
   } = props;
 
   const { userId: localUser } = useContext(AuthContext);
 
   const [commentsMenu, setCommentsMenu] = useState(false);
-  const [commentBody, setCommentBody] = useState(false);
+  const [commentBody, setCommentBody] = useState("");
 
-  const [delPost, { loading: dpLoading, error: dpError }] = useMutation(
-    DELETE_POST_MUTATION,
-    {
-      update(_, { data: { deletePost } }) {
-        deletePost(deletePost);
-      },
-      variables: { postId: id },
-    }
-  );
+  const [delPost, { loading: dpLoading }] = useMutation(DELETE_POST_MUTATION, {
+    update(cache) {
+      const data = cache.readQuery({ query: FETCH_POSTS_QUERY });
 
-  const [addComent, { loading: ccLoading, error: ccError }] = useMutation(
+      cache.writeQuery({
+        query: FETCH_POSTS_QUERY,
+        data: { getPosts: data.getPosts.filter((p) => p.id !== id) },
+      });
+    },
+    onError(err) {
+      showError(err.graphQLErrors[0].message);
+    },
+    variables: { postId: id },
+  });
+
+  const [addComent, { loading: ccLoading }] = useMutation(
     COMMENT_POST_MUTATION,
     {
-      update(_, { data: { createComment } }) {
-        updateComments(createComment);
+      update() {
+        console.log("COMMMENITNG");
+        setCommentBody("");
       },
       variables: { postId: id, body: commentBody },
+      onError(err) {
+        showError(err.graphQLErrors[0].message);
+      },
     }
   );
 
-  const [delComment, { loading: dcLoading, error: dcError }] = useMutation(
+  const [delComment, { loading: dcLoading }] = useMutation(
     DELETE_COMMENT_MUTATION,
     {
-      update(_, { data: { deleteComment } }) {
-        updateComments(deleteComment);
+      onError(err) {
+        console.log(err.graphQLErrors);
+        showError(err.graphQLErrors[0].message);
       },
     }
   );
 
-  const [addLike, { loading: alLoading, error: alError }] = useMutation(
-    LIKE_POST_MUTATION,
-    {
-      update(_, { data: { likePost } }) {
-        likePost(likePost);
-      },
-      variables: { postId: id },
-    }
-  );
+  const [addLike, { loading: alLoading }] = useMutation(LIKE_POST_MUTATION, {
+    variables: { postId: id },
+    onError(err) {
+      showError(err.graphQLErrors[0].message);
+    },
+  });
 
   const toggleComments = () => {
     setCommentsMenu((prev) => !prev);
@@ -140,11 +152,11 @@ const PostCard = (props) => {
       cardContent = (
         <Card.Content>
           <Image
-            floated="right"
+            floated="left"
             size="mini"
-            src="https://react.semantic-ui.com/images/avatar/large/molly.png"
+            src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
           />
-          <Card.Header>{`${lastname} ${firstname}`}</Card.Header>
+          <Card.Header>{`${firstname} ${lastname}`}</Card.Header>
           <Card.Meta as={Link} to={`/posts/${id}`}>
             {moment(createdAt).fromNow(true)}
           </Card.Meta>
@@ -164,8 +176,7 @@ const PostCard = (props) => {
               <Button
                 as="div"
                 labelPosition="right"
-                onClick={() => addLike(id)}
-                onBlur
+                onClick={() => localUser && addLike()}
               >
                 <Button color="teal" basic>
                   <Icon name="heart" />
@@ -178,7 +189,9 @@ const PostCard = (props) => {
             }
           >
             <Popup.Header>Likes</Popup.Header>
-            <Popup.Content>Likessss Many likess</Popup.Content>
+            <Popup.Content>
+              <Likes likes={likes} />
+            </Popup.Content>
           </Popup>
 
           <Button as="div" labelPosition="right" onClick={toggleComments}>
@@ -195,12 +208,14 @@ const PostCard = (props) => {
               color="red"
               content="Delete post"
               icon="delete"
-              onClick={() => deletePost(id)}
+              onClick={delPost}
             />
           )}
 
           {commentsMenu && (
             <Comments
+              localUserId={localUser}
+              commentBody={commentBody}
               comments={comments}
               editComment={commentBodyHandler}
               submitComment={addComent}
@@ -219,58 +234,5 @@ const PostCard = (props) => {
     </Card>
   );
 };
-
-const DELETE_POST_MUTATION = gql`
-  mutation deletePost($postId: ID!) {
-    deletePost(postId: $postId)
-  }
-`;
-
-const LIKE_POST_MUTATION = gql`
-  mutation likePost($postId: ID!) {
-    likePost(postId: $postId) {
-      id
-      likeCount
-      likes {
-        id
-        createdAt
-        firstname
-        lastname
-      }
-    }
-  }
-`;
-
-const COMMENT_POST_MUTATION = gql`
-  mutation createComment($postId: ID!, $body: String!) {
-    createComment(postId: $postId, body: $body) {
-      id
-      commentCount
-      comments {
-        id
-        createdAt
-        body
-        firstname
-        lastname
-      }
-    }
-  }
-`;
-
-const DELETE_COMMENT_MUTATION = gql`
-  mutation createComment($postId: ID!, $commentId: String!) {
-    createComment(postId: $postId, commentId: $commentId) {
-      id
-      commentCount
-      comments {
-        id
-        createdAt
-        body
-        firstname
-        lastname
-      }
-    }
-  }
-`;
 
 export default PostCard;

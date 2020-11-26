@@ -15,7 +15,7 @@ import {
   Dropdown,
   Ref,
 } from "semantic-ui-react";
-import { AuthContext } from "../context/auth";
+import { AuthContext } from "../../context/auth";
 
 const MenuBar = (props) => {
   const { token, logout, firstname, lastname, image } = useContext(AuthContext);
@@ -34,7 +34,7 @@ const MenuBar = (props) => {
     const innerHeigth = window.innerHeight;
 
     setWidth({ width: innerWidth, height: innerHeigth });
-  });
+  }, [window.innerWidth, window.innerHeigh]);
 
   useEffect(() => {
     window.addEventListener("resize", updateWindowSize);

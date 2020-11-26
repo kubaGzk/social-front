@@ -1,13 +1,12 @@
 import React from "react";
 import App from "./App";
-import ApolloClient from "apollo-client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { createUploadLink } from "apollo-upload-client";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { AuthContextProvider } from "./context/auth";
+import { createUploadLink } from "apollo-upload-client";
 
-const httpLink = createUploadLink({
+const httpLink = createUploadLink ({
   uri: "http://localhost:5000/",
 });
 

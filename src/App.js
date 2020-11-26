@@ -8,7 +8,7 @@ import {
   Switch,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import MenuBar from "./components/MenuBar";
+import MenuBar from "./components/Menu/MenuBar";
 import { Container, Dimmer, Loader } from "semantic-ui-react";
 import { AuthContext } from "./context/auth";
 import LoginPage from "./pages/LoginPage";

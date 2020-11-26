@@ -1,50 +1,51 @@
 import React, { useContext, useEffect, useState } from "react";
-import {  useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import PostCard from "../components/PostCard";
-import { Grid, Loader, TransitionGroup } from "semantic-ui-react";
+import { useQuery } from "@apollo/react-hooks";
+
+import PostCard from "../components/Post/PostCard";
+import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
 import { AuthContext } from "../context/auth";
 import NewPost from "../forms/NewPost";
+import { FETCH_POSTS_QUERY } from "../util/graphql";
 
 const Home = (props) => {
   const { token } = useContext(AuthContext);
 
-  const { loading, data } = useQuery(FETCH_POSTS_QUERY);
+  const { loading, data: { getPosts: posts } = {} } = useQuery(
+    FETCH_POSTS_QUERY
+  );
 
-  const [posts, setPosts] = useState();
+  const [error, setError] = useState();
 
-  const deletePostHandler = (postId) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  const setErrorHandler = (message) => {
+    setError(message);
+
+    setTimeout(() => {
+      setError(null);
+    }, 5000);
   };
-
-  const updateCommentsHandler = (post) => {};
-
-  const likePostHandler = (post) => {};
-
-  useEffect(() => {
-    if (data && data.getPosts) {
-      setPosts(data.getPosts);
-    }
-  }, [data]);
 
   return (
     <Grid style={{ marginTop: "20px" }}>
       <Grid.Column className="post-column">
-        {token && <NewPost setPosts={setPosts} posts={posts} />}
-
+        {token && <NewPost posts={posts} />}
+        {error && (
+          <Message
+            size="huge"
+            error
+            style={{ position: "fixed", top: "5%", zIndex: "500" }}
+          >
+            <Message.Header>Error message</Message.Header>
+            {error}
+          </Message>
+        )}
         {loading ? (
           <Loader active />
         ) : (
           <TransitionGroup>
             {posts &&
               posts.map((post) => (
-                <Grid.Row key={post.id} className="post-item">
-                  <PostCard
-                    post={post}
-                    deletePost={deletePostHandler}
-                    updateComments={updateCommentsHandler}
-                    likePost={likePostHandler}
-                  />
+                <Grid.Row key={post.id + "_postcard"} className="post-item">
+                  <PostCard post={post} showError={setErrorHandler} />
                 </Grid.Row>
               ))}
           </TransitionGroup>
@@ -53,36 +54,5 @@ const Home = (props) => {
     </Grid>
   );
 };
-
-const FETCH_POSTS_QUERY = gql`
-  {
-    getPosts {
-      id
-      type
-      body
-      image
-      createdAt
-      firstname
-      lastname
-      userImage
-      userId
-      likeCount
-      likes {
-        id
-        createdAt
-        firstname
-        lastname
-      }
-      commentCount
-      comments {
-        id
-        createdAt
-        body
-        firstname
-        lastname
-      }
-    }
-  }
-`;
 
 export default Home;
