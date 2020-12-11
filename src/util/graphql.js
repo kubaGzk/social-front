@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const FETCH_POSTS_QUERY = gql`
-  {
-    getPosts {
+  query getPosts($offset: Int) {
+    getPosts(offset: $offset) {
       id
       type
       body
@@ -146,10 +146,10 @@ export const CREATE_POST = gql`
       userId
       likeCount
       commentCount
-      likes{
+      likes {
         id
       }
-      comments{
+      comments {
         id
       }
       type
@@ -157,6 +157,18 @@ export const CREATE_POST = gql`
       firstname
       lastname
       userImage
+    }
+  }
+`;
+
+export const VALIDATE_TOKEN = gql`
+  mutation validate {
+    validateToken {
+      id
+      email
+      lastname
+      firstname
+      image
     }
   }
 `;

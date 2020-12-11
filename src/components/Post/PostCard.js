@@ -172,6 +172,7 @@ const PostCard = (props) => {
       <Segment style={{ borderRadius: "0", borderWidth: "1px 0 0 0" }}>
         <Card.Content extra>
           <Popup
+          hoverable
             trigger={
               <Button
                 as="div"
@@ -187,6 +188,7 @@ const PostCard = (props) => {
                 </Label>
               </Button>
             }
+            
           >
             <Popup.Header>Likes</Popup.Header>
             <Popup.Content>

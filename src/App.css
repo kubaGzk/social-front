@@ -1,10 +1,13 @@
 .App {
   width: 100%;
   height: 100%;
+  min-height: 100vh;
+  margin: 0;
 }
 
 .body-container {
   height: 100%;
+  margin-top: 5rem;
 }
 
 .page-title {
@@ -63,6 +66,14 @@
   display: flex !important;
   flex-direction: column;
   align-items: center;
+}
+
+.login-container {
+  background-color: #fff;
+  border-radius: 0.28571429rem;
+  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+  min-height: 85vh;
+  padding: 2rem;
 }
 
 @media (max-width: 767px) {

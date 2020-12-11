@@ -16,7 +16,7 @@ const LoginPage = (props) => {
         label={currentPage === "login" ? "To register" : "To login"}
         toggle
         onChange={switchPage}
-        style={{ padding: "20px" }}
+        style={{ padding: "0.25rem" }}
       />
       {currentPage === "login" ? (
         <Login history={props.history} />

@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import React, { createContext, useCallback, useReducer } from "react";
 import jwtDecode from "jwt-decode";
+import { VALIDATE_TOKEN } from "../util/graphql";
 
 const INITIAL_STATE = {
   token: null,
@@ -144,16 +144,6 @@ const AuthContextProvider = (props) => {
   );
 };
 
-const VALIDATE_TOKEN = gql`
-  mutation validate {
-    validateToken {
-      id
-      email
-      lastname
-      firstname
-      image
-    }
-  }
-`;
+
 
 export { AuthContext, AuthContextProvider };

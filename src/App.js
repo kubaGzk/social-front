@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import "semantic-ui-css/semantic.min.css";
 import "./App.css";
 import {
@@ -8,17 +8,17 @@ import {
   Switch,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import MenuBar from "./components/Menu/MenuBar";
 import { Container, Dimmer, Loader } from "semantic-ui-react";
 import { AuthContext } from "./context/auth";
 import LoginPage from "./pages/LoginPage";
+import Layout from "./components/Menu/Layout";
 
 function App() {
   const { token, checkLocal, loading } = useContext(AuthContext);
 
   useEffect(() => {
     checkLocal();
-  }, []);
+  },[]);
 
   let routes = (
     <>
@@ -32,20 +32,20 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" id="App">
       <Router>
-        <Container className="body-container">
-          <MenuBar />
-          <Switch>
-            {routes}
-            <Redirect to="/" />
-          </Switch>
-        </Container>
+        <Layout>
+          <Container className="body-container">
+            <Switch>
+              {routes}
+              <Redirect to="/" />
+            </Switch>
+          </Container>
+        </Layout>
+        <Dimmer active={loading} style={{ minHeight: "100vh" }}>
+          <Loader size="huge">Loading</Loader>
+        </Dimmer>
       </Router>
-
-      <Dimmer active={loading}>
-        <Loader size="huge">Loading</Loader>
-      </Dimmer>
     </div>
   );
 }

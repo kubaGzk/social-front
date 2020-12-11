@@ -5,8 +5,10 @@ import { setContext } from "@apollo/client/link/context";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { AuthContextProvider } from "./context/auth";
 import { createUploadLink } from "apollo-upload-client";
+import { DimensionContextProvider } from "./context/dimension";
+import { offsetLimitPagination } from "@apollo/client/utilities";
 
-const httpLink = createUploadLink ({
+const httpLink = createUploadLink({
   uri: "http://localhost:5000/",
 });
 
@@ -22,13 +24,23 @@ const authLink = setContext((_, { headers }) => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          getPosts: offsetLimitPagination(),
+        },
+      },
+    },
+  }),
 });
 
 export default (
   <ApolloProvider client={client}>
     <AuthContextProvider>
-      <App />
+      <DimensionContextProvider>
+        <App />
+      </DimensionContextProvider>
     </AuthContextProvider>
   </ApolloProvider>
 );

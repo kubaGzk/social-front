@@ -3,12 +3,15 @@ import React from "react";
 const Likes = (props) => {
   let body = "No likes";
 
+  console.log("Likes", props);
+
   if (props.likes.length > 0) {
     body = props.likes.reduce((accBody, like, ind) => {
       ind === 10 && accBody.push(<p>...</p>);
       ind < 10 &&
         accBody.push(
           <p
+            key={like.id}
             style={{ margin: "1px" }}
           >{`${like.firstname} ${like.lastname}`}</p>
         );
