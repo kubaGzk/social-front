@@ -49,8 +49,6 @@ const DimensionContextProvider = (props) => {
     const scrollWidth = document.body.offsetWidth;
     const scrollHeight = document.body.offsetHeight;
 
-    console.log(document.body.scrollTop)
-
     dispatch({ type: "SCROLL", scrollX, scrollY, scrollWidth, scrollHeight });
   }, [
     window.scrollX,

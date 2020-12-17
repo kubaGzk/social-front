@@ -118,10 +118,11 @@ const PostCard = (props) => {
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
           />
-          <Card.Header>{`${firstname} ${lastname}`}</Card.Header>
-          <Card.Meta as={Link} to={`/posts/${id}`}>
-            {moment(createdAt).fromNow(true)}
-          </Card.Meta>
+          <Card.Header
+            as={Link}
+            to={`/user/${userId}`}
+          >{`${firstname} ${lastname}`}</Card.Header>
+          <Card.Meta>{moment(createdAt).fromNow(true)}</Card.Meta>
           <Card.Description>{body}</Card.Description>
         </Card.Content>
       );
@@ -136,7 +137,10 @@ const PostCard = (props) => {
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
           />
-          <Card.Header>{`${firstname} ${lastname}`}</Card.Header>
+          <Card.Header
+            as={Link}
+            to={`/user/${userId}`}
+          >{`${firstname} ${lastname}`}</Card.Header>
           <Card.Meta>{moment(createdAt).fromNow(true)}</Card.Meta>
           <Card.Description>
             <p>{body}</p>
@@ -156,7 +160,10 @@ const PostCard = (props) => {
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
           />
-          <Card.Header>{`${firstname} ${lastname}`}</Card.Header>
+          <Card.Header
+            as={Link}
+            to={`/user/${userId}`}
+          >{`${firstname} ${lastname}`}</Card.Header>
           <Card.Meta as={Link} to={`/posts/${id}`}>
             {moment(createdAt).fromNow(true)}
           </Card.Meta>
@@ -172,7 +179,7 @@ const PostCard = (props) => {
       <Segment style={{ borderRadius: "0", borderWidth: "1px 0 0 0" }}>
         <Card.Content extra>
           <Popup
-          hoverable
+            hoverable
             trigger={
               <Button
                 as="div"
@@ -188,7 +195,6 @@ const PostCard = (props) => {
                 </Label>
               </Button>
             }
-            
           >
             <Popup.Header>Likes</Popup.Header>
             <Popup.Content>

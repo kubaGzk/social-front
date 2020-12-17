@@ -8,6 +8,7 @@ import {
   Icon,
 } from "semantic-ui-react";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 const Comments = (props) => {
   let comments = "No comments";
@@ -22,7 +23,7 @@ const Comments = (props) => {
       <Comment key={com.id}>
         <Comment.Avatar src={process.env.REACT_APP_IMAGES_URL+"/" + com.image} />
         <Comment.Content>
-          <Comment.Author as="a">
+          <Comment.Author as={Link} to={`/user/${com.userId}`}>
             {com.firstname + " " + com.lastname}
           </Comment.Author>
           <Comment.Metadata>

@@ -1,49 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useLazyQuery, useQuery } from "@apollo/react-hooks";
-
+import React, { useContext, useEffect } from "react";
 import PostCard from "../components/Post/PostCard";
 import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
-import { AuthContext } from "../context/auth";
 import NewPost from "../forms/NewPost";
-import { FETCH_POSTS_QUERY } from "../util/graphql";
-import { DimensionContext } from "../context/dimension";
+import { useGetPosts } from "../util/hooks";
+import { AuthContext } from "../context/auth";
 
 const Home = (props) => {
+  const { error, posts, setError, dataComplete, loading } = useGetPosts();
+
   const { token } = useContext(AuthContext);
-  const { height, scrollY, scrollHeight } = useContext(DimensionContext);
-
-  const [postsOffset, setOffset] = useState(0);
-  const [dataComplete, setDataComplete] = useState(false);
-  const [error, setError] = useState();
-
-  const { loading, data, fetchMore } = useQuery(FETCH_POSTS_QUERY, {
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data) => {
-      if (data.getPosts.length === postsOffset) setDataComplete(true);
-    },
-  });
-
-  let posts = [];
-  if (data && data.getPosts) posts = data.getPosts;
 
   useEffect(() => {
-    postsOffset !== posts.length && setOffset(posts.length);
-  }, [posts]);
-
-  useEffect(() => {
-    //56px - Loader size
-    if (height + scrollY + 56 >= scrollHeight && !loading && !dataComplete) {
-      fetchMore({ variables: { offset: postsOffset } });
-    }
-  }, [height, scrollY, scrollHeight]);
-
-  const setErrorHandler = (message) => {
-    setError(message);
-
-    setTimeout(() => {
-      setError(null);
-    }, 5000);
-  };
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Grid style={{ margin: "0" }}>
@@ -60,12 +29,16 @@ const Home = (props) => {
           </Message>
         )}
         <TransitionGroup>
-          {posts &&
-            posts.map((post) => (
-              <Grid.Row key={post.id + "_postcard"} className="post-item">
-                <PostCard post={post} showError={setErrorHandler} />
-              </Grid.Row>
-            ))}
+          {posts.map((post) => (
+            <Grid.Row key={post.id + "_postcard"} className="post-item">
+              <PostCard post={post} showError={setError} />
+            </Grid.Row>
+          ))}
+          {!loading && posts.length === 0 && (
+            <Grid.Row>
+              <h2>No posts found</h2>
+            </Grid.Row>
+          )}
           {!dataComplete && (
             <Grid.Row style={{ height: "4rem", paddingTop: "2rem" }}>
               <Loader active style={{ position: "inherit" }} />

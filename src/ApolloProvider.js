@@ -28,7 +28,12 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          getPosts: offsetLimitPagination(),
+          getPosts: {
+            keyArgs: ["userId"],
+            merge(existing = [], incoming) {
+              return [...existing, ...incoming];
+            },
+          },
         },
       },
     },

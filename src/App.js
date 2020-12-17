@@ -12,23 +12,30 @@ import { Container, Dimmer, Loader } from "semantic-ui-react";
 import { AuthContext } from "./context/auth";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Menu/Layout";
+import User from "./pages/User";
 
 function App() {
   const { token, checkLocal, loading } = useContext(AuthContext);
 
   useEffect(() => {
     checkLocal();
-  },[]);
+  }, []);
 
   let routes = (
     <>
       <Route exact path="/" component={Home} />
       <Route exact path="/login" component={LoginPage} />
+      <Route exact path="/user/:id" component={User} />
     </>
   );
 
   if (token) {
-    routes = <Route exact path="/" component={Home} />;
+    routes = (
+      <>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/user/:id" component={User} />
+      </>
+    );
   }
 
   return (

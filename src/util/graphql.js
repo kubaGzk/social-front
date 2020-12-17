@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const FETCH_POSTS_QUERY = gql`
-  query getPosts($offset: Int) {
-    getPosts(offset: $offset) {
+  query getPosts($offset: Int, $userId: ID) {
+    getPosts(offset: $offset, userId: $userId) {
       id
       type
       body
@@ -168,6 +168,19 @@ export const VALIDATE_TOKEN = gql`
       email
       lastname
       firstname
+      image
+    }
+  }
+`;
+
+export const FETCH_USER_INFO_QUERY = gql`
+  query getUserInfo($userId: ID!) {
+    getUserInfo(userId: $userId) {
+      id
+      email
+      firstname
+      lastname
+      createdAt
       image
     }
   }
