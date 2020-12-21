@@ -182,6 +182,26 @@ export const FETCH_USER_INFO_QUERY = gql`
       lastname
       createdAt
       image
+      friends
+      invitesSend
+      invitesReceived
+      postsCount
     }
+  }
+`;
+
+export const CREATE_INVITE = gql`
+  mutation createInvite($receiver: ID!) {
+    createInvite(receiver: $receiver)
+  }
+`;
+export const CONFIRM_INVITE = gql`
+  mutation confirmInvite($requestor: ID!) {
+    confirmInvite(requestor: $requestor)
+  }
+`;
+export const DECLINE_INVITE = gql`
+  mutation declineInvite($requestor: ID!) {
+    declineInvite(requestor: $requestor)
   }
 `;

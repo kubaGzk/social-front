@@ -23,17 +23,17 @@ function App() {
 
   let routes = (
     <>
-      <Route exact path="/" component={Home} />
       <Route exact path="/login" component={LoginPage} />
       <Route exact path="/user/:id" component={User} />
+      <Route exact path="/" component={Home} />
     </>
   );
 
   if (token) {
     routes = (
       <>
-        <Route exact path="/" component={Home} />
         <Route exact path="/user/:id" component={User} />
+        <Route exact path="/" component={Home} />
       </>
     );
   }

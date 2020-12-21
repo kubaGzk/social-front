@@ -6,7 +6,6 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import { AuthContextProvider } from "./context/auth";
 import { createUploadLink } from "apollo-upload-client";
 import { DimensionContextProvider } from "./context/dimension";
-import { offsetLimitPagination } from "@apollo/client/utilities";
 
 const httpLink = createUploadLink({
   uri: "http://localhost:5000/",
@@ -30,7 +29,13 @@ const client = new ApolloClient({
         fields: {
           getPosts: {
             keyArgs: ["userId"],
-            merge(existing = [], incoming) {
+            merge(existing = [], incoming, { readField }) {
+              if (incoming.length === 1) {
+                const inDate = new Date(readField("createdAt", incoming[0]));
+                const exDate = new Date(readField("createdAt", existing[0]));
+
+                if (inDate > exDate) return [...incoming, ...existing];
+              }
               return [...existing, ...incoming];
             },
           },

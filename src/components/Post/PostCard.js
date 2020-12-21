@@ -51,15 +51,17 @@ const PostCard = (props) => {
 
   const [delPost, { loading: dpLoading }] = useMutation(DELETE_POST_MUTATION, {
     update(cache) {
-      const data = cache.readQuery({ query: FETCH_POSTS_QUERY });
+      let postKey;
 
-      cache.writeQuery({
-        query: FETCH_POSTS_QUERY,
-        data: { getPosts: data.getPosts.filter((p) => p.id !== id) },
-      });
+      for (let key in cache.data.data) {
+        if (cache.data.data[key].id === id) postKey = key;
+      }
+
+      cache.data.delete(postKey);
     },
     onError(err) {
-      showError(err.graphQLErrors[0].message);
+      console.log(err);
+      showError("Error");
     },
     variables: { postId: id },
   });

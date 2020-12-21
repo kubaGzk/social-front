@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import React, { createContext, useCallback, useReducer } from "react";
 import jwtDecode from "jwt-decode";
 import { VALIDATE_TOKEN } from "../util/graphql";
+import { useApolloClient } from "@apollo/client";
 
 const INITIAL_STATE = {
   token: null,
@@ -52,9 +53,13 @@ const AuthContextProvider = (props) => {
     dispatch,
   ] = useReducer(authReducer, INITIAL_STATE);
 
+  const client = useApolloClient();
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("expiresIn");
+
+    client.resetStore();
 
     dispatch({ type: "LOGOUT" });
   };
@@ -143,7 +148,5 @@ const AuthContextProvider = (props) => {
     />
   );
 };
-
-
 
 export { AuthContext, AuthContextProvider };

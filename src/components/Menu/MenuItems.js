@@ -1,19 +1,20 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { Button, Icon, Input, Label, Menu } from "semantic-ui-react";
+import { Button, Icon, Input, Label, Menu, Dropdown } from "semantic-ui-react";
 import { AuthContext } from "../../context/auth";
 import { DimensionContext } from "../../context/dimension";
 
 const MenuItems = (props) => {
-  const { token, logout, firstname, lastname, image } = useContext(AuthContext);
-    const {width} = useContext(DimensionContext)
+  const { token, logout, firstname, lastname, image, userId } = useContext(
+    AuthContext
+  );
+  const { width } = useContext(DimensionContext);
 
   const { toggleMenu } = props;
 
-
   let menuItems = (
     <>
-      {width <= 767 && <Menu.Item />}
+      {width <= 767}
       <Menu.Item name="login">
         <Button
           as={Link}
@@ -38,10 +39,9 @@ const MenuItems = (props) => {
             placeholder="Search for friend..."
           />
         </Menu.Item>
-        <Menu.Item name="logout" onClick={logout} as={Link} to="/" />
         <Menu.Item style={{ maxWidth: "13rem" }}>
           <Label
-            as="a"
+            as={Link}
             style={{
               marginLeft: "0",
               display: "flex",
@@ -49,6 +49,7 @@ const MenuItems = (props) => {
               alignItems: "center",
             }}
             onClick={toggleMenu}
+            to={`/user/${userId}`}
           >
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
@@ -59,6 +60,24 @@ const MenuItems = (props) => {
             </span>
           </Label>
         </Menu.Item>
+        <Menu.Item style={{ padding: "0" }}>
+          <Dropdown
+            icon="ellipsis vertical"
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "4rem",
+            }}
+          >
+            <Dropdown.Menu>
+              <Dropdown.Item text="Open..." description="ctrl + o" />
+              <Dropdown.Divider />
+              <Dropdown.Item text="Logout" onClick={logout} as={Link} to="/" />
+            </Dropdown.Menu>
+          </Dropdown>
+        </Menu.Item>
       </>
     );
   } else if (token) {
@@ -66,7 +85,7 @@ const MenuItems = (props) => {
       <>
         <Menu.Item />
         <Menu.Item style={{ display: "flex" }}>
-          <Label as="a" onClick={toggleMenu}>
+          <Label onClick={toggleMenu} as={Link} to={`/user/${userId}`}>
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
               style={{ borderRadius: "inherit" }}

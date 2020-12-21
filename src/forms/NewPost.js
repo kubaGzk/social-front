@@ -24,7 +24,7 @@ const NewPost = (props) => {
 
       cache.writeQuery({
         query: FETCH_POSTS_QUERY,
-        data: { getPosts: [postData, ...data.getPosts] },
+        data: { getPosts: [postData] },
       });
     },
     onError(err) {

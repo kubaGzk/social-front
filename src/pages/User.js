@@ -17,9 +17,19 @@ const User = (props) => {
 
   const [localError, setLocalError] = useState();
 
+  const [message, setMessage] = useState();
+
+  const showMessage = (messText) => {
+    setMessage(messText);
+
+    setTimeout(() => {
+      setMessage(null);
+    }, 5000);
+  };
+
   let user;
 
-  const { data } = useQuery(FETCH_USER_INFO_QUERY, {
+  const { data, refetch, loadingUser } = useQuery(FETCH_USER_INFO_QUERY, {
     onError: (err) => {
       let message = "Unexpected error";
 
@@ -30,7 +40,7 @@ const User = (props) => {
 
       setTimeout(() => {
         setLocalError(null);
-      }, 5000);
+      }, 3000);
     },
     variables: { userId: props.match.params.id },
   });
@@ -40,8 +50,25 @@ const User = (props) => {
   return (
     <Grid style={{ margin: "0" }}>
       <Grid.Column className="post-column">
+        {message && (
+          <Message
+            info
+            size="small"
+            style={{ position: "fixed", top: "5%", zIndex: "100" }}
+          >
+            <Message.Header>Message</Message.Header>
+            {message}
+          </Message>
+        )}
         <TransitionGroup>
-          {user && <UserCard user={user} />}
+          {user && (
+            <UserCard
+              user={user}
+              refetch={refetch}
+              loading={loadingUser}
+              showMessage={showMessage}
+            />
+          )}
           {posts.map((post) => (
             <Grid.Row key={post.id + "_postcard"} className="post-item">
               <PostCard post={post} showError={setError} />

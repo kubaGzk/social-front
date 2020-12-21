@@ -35,6 +35,7 @@
 
 .post-image {
   width: 100%;
+  height: 50vh;
   display: flex;
   justify-content: center;
   background-color: rgba(120, 121, 120, 0.1);
@@ -45,6 +46,7 @@
 
 .post-image img {
   width: fit-content;
+  object-fit: contain;
 }
 
 .post-add {
