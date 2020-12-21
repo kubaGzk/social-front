@@ -1,10 +1,10 @@
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import React, { createContext, useCallback, useReducer } from "react";
+import jwtDecode from "jwt-decode";
+import { VALIDATE_TOKEN } from "../util/graphql";
 
 const INITIAL_STATE = {
   token: null,
-  username: null,
   image: null,
   firstname: null,
   lastname: null,
@@ -27,7 +27,6 @@ const authReducer = (state, action) => {
       return {
         ...state,
         token: action.token,
-        username: action.username,
         image: action.image,
         firstname: action.firstname,
         lastname: action.lastname,
@@ -62,26 +61,19 @@ const AuthContextProvider = (props) => {
 
   const login = (
     funToken,
-    funUsername,
     funFirst,
     funLast,
     funImage,
     funUserId,
-    funEmail,
-    expiresIn
+    funEmail
   ) => {
-    let expirationTime = expiresIn;
-
-    if (!expiresIn) {
-      localStorage.setItem("token", funToken);
-      localStorage.setItem("expiresIn", new Date().getTime() + 3600 * 1000);
-      expirationTime = 3600 * 1000;
-    }
+    localStorage.setItem("token", funToken);
+    const { exp } = jwtDecode(funToken);
+    const expirationDate = exp * 1000 - Date.now();
 
     dispatch({
       type: "LOGIN",
       token: funToken,
-      username: funUsername,
       firstname: funFirst,
       lastname: funLast,
       image: funImage,
@@ -90,7 +82,7 @@ const AuthContextProvider = (props) => {
     });
     setTimeout(() => {
       logout();
-    }, expirationTime);
+    }, expirationDate);
   };
 
   const [validateToken, { loading }] = useMutation(VALIDATE_TOKEN, {
@@ -98,7 +90,6 @@ const AuthContextProvider = (props) => {
       const {
         data: {
           validateToken: {
-            username: localUsername,
             id: localId,
             email: localEmail,
             firstname: localFirstname,
@@ -109,28 +100,14 @@ const AuthContextProvider = (props) => {
       } = result;
 
       const localToken = localStorage.getItem("token");
-      const localExpiresIn =
-        localStorage.getItem("expiresIn") - new Date().getTime();
 
-      console.log(
-        localToken,
-        localUsername,
-        localFirstname,
-        localLastname,
-        localImage,
-        localId,
-        localEmail,
-        localExpiresIn
-      );
       login(
         localToken,
-        localUsername,
         localFirstname,
         localLastname,
         localImage,
         localId,
-        localEmail,
-        localExpiresIn
+        localEmail
       );
     },
     onError(err) {
@@ -141,20 +118,17 @@ const AuthContextProvider = (props) => {
 
   const checkLocal = useCallback(() => {
     const localToken = localStorage.getItem("token");
-    const localExpiresIn =
-      localStorage.getItem("expiresIn") - new Date().getTime();
 
-    if (!token && localToken && localExpiresIn) {
-      console.log();
-      validateToken();
+    if (!token && localToken) {
+      const { exp } = jwtDecode(localToken);
+      exp * 1000 - Date.now() > 0 ? validateToken() : logout();
     }
-  }, [validateToken]);
+  }, [validateToken, logout]);
 
   return (
     <AuthContext.Provider
       value={{
         token,
-        username,
         image,
         firstname,
         lastname,
@@ -170,17 +144,6 @@ const AuthContextProvider = (props) => {
   );
 };
 
-const VALIDATE_TOKEN = gql`
-  mutation validate {
-    validateToken {
-      id
-      email
-      username
-      lastname
-      firstname
-      image
-    }
-  }
-`;
+
 
 export { AuthContext, AuthContextProvider };

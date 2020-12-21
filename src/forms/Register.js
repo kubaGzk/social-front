@@ -1,8 +1,10 @@
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import React, { useContext, useState } from "react";
+
 import { Button, Form } from "semantic-ui-react";
+import ImageEditor from "../components/Image/ImageEditor";
 import { AuthContext } from "../context/auth";
+import { REGISTER_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
 
 const INITIAL_STATE = {
@@ -19,6 +21,7 @@ const Register = (props) => {
   const { login } = useContext(AuthContext);
 
   const [errors, setErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   const [values, onChange, onSubmit] = useForm(registerHandler, INITIAL_STATE);
 
@@ -26,14 +29,13 @@ const Register = (props) => {
     update(_, result) {
       const {
         data: {
-          register: { id, email, token, username, firstname, lastname, image },
+          register: { id, email, token, firstname, lastname, image },
         },
       } = result;
-      login(token, username, firstname, lastname, image, id, email);
+      login(token, firstname, lastname, image, id, email);
       props.history.push("/");
     },
     onError(err) {
-      console.log(err.graphQLErrors[0].extensions.exception.errors);
       setErrors(err.graphQLErrors[0].extensions.exception.errors);
     },
     variables: values,
@@ -43,9 +45,14 @@ const Register = (props) => {
     addUser();
   }
 
+  const selectImage = (e) => {
+    onChange(e);
+    setShowModal(true);
+  };
+
   return (
     <div className="form-container">
-      <Form  onSubmit={onSubmit} noValidate className={loading ? "loading" : ""}>
+      <Form onSubmit={onSubmit} noValidate className={loading ? "loading" : ""}>
         <h1 className="page-title">Register</h1>
         <Form.Input
           label="Username"
@@ -104,15 +111,27 @@ const Register = (props) => {
         <Form.Input
           label="Image"
           name="image"
-          onChange={onChange}
+          id="avatar-image-select"
+          onChange={selectImage}
           error={errors.image ? true : false}
           type="file"
           accept="image/*"
+          style={{
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            whiteSpace: " nowrap",
+          }}
         />
         <Button type="submit" primary>
           Register
         </Button>
       </Form>
+      <ImageEditor
+        showModal={showModal}
+        setShowModal={setShowModal}
+        image={values.image}
+        changeValue={onChange}
+      />
       {Object.keys(errors).length > 0 && (
         <div className="ui error message">
           <ul className="list">
@@ -125,38 +144,5 @@ const Register = (props) => {
     </div>
   );
 };
-
-const REGISTER_USER = gql`
-  mutation register(
-    $username: String!
-    $firstname: String!
-    $lastname: String!
-    $email: String!
-    $password: String!
-    $confirmPassword: String!
-    $image: Upload!
-  ) {
-    register(
-      registerInput: {
-        username: $username
-        firstname: $firstname
-        lastname: $lastname
-        email: $email
-        password: $password
-        confirmPassword: $confirmPassword
-        image: $image
-      }
-    ) {
-      id
-      email
-      username
-      firstname
-      lastname
-      image
-      createdAt
-      token
-    }
-  }
-`;
 
 export default Register;

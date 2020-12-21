@@ -1,8 +1,8 @@
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import React, { useState, useContext, useAuth } from "react";
 import { Button, Form } from "semantic-ui-react";
 import { AuthContext } from "../context/auth";
+import { LOGIN_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
 
 const INITIAL_STATE = {
@@ -20,11 +20,11 @@ const Login = (props) => {
     update(_, result) {
       const {
         data: {
-          login: { id, email, token, username, firstname, lastname, image },
+          login: { id, email, token, firstname, lastname, image },
         },
       } = result;
 
-      login(token, username, firstname, lastname, image, id, email);
+      login(token, firstname, lastname, image, id, email);
       props.history.push("/");
     },
 
@@ -80,18 +80,6 @@ const Login = (props) => {
   );
 };
 
-const LOGIN_USER = gql`
-  mutation login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      id
-      email
-      firstname
-      lastname
-      username
-      token
-      image
-    }
-  }
-`;
+
 
 export default Login;

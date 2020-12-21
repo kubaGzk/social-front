@@ -1,61 +1,53 @@
-import React from "react";
-import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import PostCard from "../components/PostCard";
-import { Grid } from "semantic-ui-react";
+import React, { useContext, useEffect } from "react";
+import PostCard from "../components/Post/PostCard";
+import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
+import NewPost from "../forms/NewPost";
+import { useGetPosts } from "../util/hooks";
+import { AuthContext } from "../context/auth";
 
 const Home = (props) => {
-  const { loading, data } = useQuery(FETCH_POSTS_QUERY);
+  const { error, posts, setError, dataComplete, loading } = useGetPosts();
 
-  let posts;
-  if (data) posts = data.getPosts;
+  const { token } = useContext(AuthContext);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <Grid columns={1}>
-      <Grid.Row className="page-title">
-        <h1>Recent Posts</h1>
-      </Grid.Row>
-      <Grid.Row>
-        {loading ? (
-          <h1>Loading posts...</h1>
-        ) : (
-          posts &&
-          posts.map((post) => (
-            <Grid.Column key={post.id} style={{ marginBottom: "20px" }}>
-              <PostCard post={post} />
-            </Grid.Column>
-          ))
+    <Grid style={{ margin: "0" }}>
+      <Grid.Column className="post-column">
+        {token && <NewPost posts={posts} />}
+        {error && (
+          <Message
+            size="huge"
+            error
+            style={{ position: "fixed", top: "5%", zIndex: "100" }}
+          >
+            <Message.Header>Error message</Message.Header>
+            {error}
+          </Message>
         )}
-      </Grid.Row>
+        <TransitionGroup>
+          {posts.map((post) => (
+            <Grid.Row key={post.id + "_postcard"} className="post-item">
+              <PostCard post={post} showError={setError} />
+            </Grid.Row>
+          ))}
+          {!loading && posts.length === 0 && (
+            <Grid.Row>
+              <h2>No posts found</h2>
+            </Grid.Row>
+          )}
+          {!dataComplete && (
+            <Grid.Row style={{ height: "4rem", paddingTop: "2rem" }}>
+              <Loader active style={{ position: "inherit" }} />
+            </Grid.Row>
+          )}
+        </TransitionGroup>
+      </Grid.Column>
     </Grid>
   );
 };
-
-const FETCH_POSTS_QUERY = gql`
-  {
-    getPosts {
-      id
-      body
-      createdAt
-      username
-      likeCount
-      likes {
-        id
-        username
-        firstname
-        lastname
-      }
-      commentCount
-      comments {
-        id
-        username
-        createdAt
-        body
-        firstname
-        lastname
-      }
-    }
-  }
-`;
 
 export default Home;
