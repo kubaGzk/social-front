@@ -33,8 +33,9 @@ const UserCard = (props) => {
       id,
     },
     loading,
-    refetch,
+    refetchUser,
     showMessage,
+    refetchPosts
   } = props;
 
   const { userId, token } = useContext(AuthContext);
@@ -48,7 +49,7 @@ const UserCard = (props) => {
     variables: { receiver: id },
     update(c, { data: { createInvite } }) {
       showMessage(createInvite);
-      refetch();
+      refetchUser();
     },
   });
 
@@ -59,7 +60,7 @@ const UserCard = (props) => {
     variables: { requestor: id },
     update(c, { data: { confirmInvite } }) {
       showMessage(confirmInvite);
-      refetch();
+      refetchUser();
     },
   });
 
@@ -70,7 +71,7 @@ const UserCard = (props) => {
     variables: { requestor: id },
     update(c, { data: { declineInvite } }) {
       showMessage(declineInvite);
-      refetch();
+      refetchUser();
     },
   });
 
@@ -129,8 +130,11 @@ const UserCard = (props) => {
                   firstname={firstname}
                   lastname={lastname}
                   image={image}
+                  description={description}
                   id={id}
                   setEditMode={setEditMode}
+                  refetchUser={refetchUser}
+                  refetchPosts={refetchPosts}
                 />
               ) : (
                 <>

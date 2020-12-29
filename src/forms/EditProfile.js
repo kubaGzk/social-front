@@ -1,13 +1,26 @@
 import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Form, Item } from "semantic-ui-react";
-import { CREATE_INVITE } from "../util/graphql";
+import ImageEditor from "../components/Image/ImageEditor";
+import { AuthContext } from "../context/auth";
+import { CREATE_INVITE, UPDATE_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
 
 const EditProfile = (props) => {
-  const { firstname, lastname, image, id, description, setEditMode } = props;
+  const {
+    firstname,
+    lastname,
+    image,
+    id,
+    description,
+    setEditMode,
+    refetchUser,
+    refetchPosts,
+  } = props;
 
-  const [values, onChange, onSubmit] = useForm(() => {}, {
+  const { updateUserData } = useContext(AuthContext);
+
+  const [values, onChange, onSubmit] = useForm(updateHandler, {
     firstname,
     lastname,
     image: "",
@@ -17,13 +30,34 @@ const EditProfile = (props) => {
   const [errors, setErrors] = useState({});
   const [showModal, setShowModal] = useState(false);
 
-  const [updateUser, { loading }] = useMutation(CREATE_INVITE, {
-    update(_, {}) {},
-    onError(err) {
-      setErrors(err.graphQLErrors[0].extensions.exception.errors);
+  const [updateUser, { loading }] = useMutation(UPDATE_USER, {
+    update(
+      _,
+      {
+        data: {
+          updateUser: { firstname, lastname, image },
+        },
+      }
+    ) {
+      refetchUser();
+      refetchPosts();
+      updateUserData(firstname, lastname, image);
+      setEditMode(false);
+    },
+    onError({ graphQLErrors, networkError }) {
+      console.log(graphQLErrors, networkError);
+
+      graphQLErrors[0] &&
+        setErrors(graphQLErrors[0].extensions.exception.errors);
+
+      networkError && setErrors({ general: "Unexpected network error" });
     },
     variables: values,
   });
+
+  function updateHandler() {
+    updateUser();
+  }
 
   const selectImage = (e) => {
     onChange(e);
@@ -37,7 +71,7 @@ const EditProfile = (props) => {
         size="small"
       />
       <Item.Content>
-        <Form noValidate>
+        <Form noValidate className={loading ? "loading" : ""}>
           <Form.Input
             label="First name"
             placeholder="Firstname..."
@@ -83,6 +117,12 @@ const EditProfile = (props) => {
             }}
           />
         </Form>
+        <ImageEditor
+          showModal={showModal}
+          setShowModal={setShowModal}
+          image={values.image}
+          changeValue={onChange}
+        />
         {Object.keys(errors).length > 0 && (
           <div className="ui error message">
             <ul className="list">
@@ -94,12 +134,7 @@ const EditProfile = (props) => {
         )}
         <Item.Extra>
           <Button.Group floated="right">
-            <Button
-              positive
-              onClick={() => {
-                console.log("SAVING");
-              }}
-            >
+            <Button positive onClick={onSubmit}>
               Save changes
             </Button>
             <Button.Or />

@@ -11,9 +11,14 @@ const User = (props) => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { error, posts, setError, dataComplete, loading } = useGetPosts(
-    props.match.params.id
-  );
+  const {
+    error,
+    posts,
+    setError,
+    dataComplete,
+    loading,
+    refetch: refetchPosts,
+  } = useGetPosts(props.match.params.id);
 
   const [localError, setLocalError] = useState();
 
@@ -29,21 +34,24 @@ const User = (props) => {
 
   let user;
 
-  const { data, refetch, loadingUser } = useQuery(FETCH_USER_INFO_QUERY, {
-    onError: (err) => {
-      let message = "Unexpected error";
+  const { data, refetch: refetchUser, loadingUser } = useQuery(
+    FETCH_USER_INFO_QUERY,
+    {
+      onError: (err) => {
+        let message = "Unexpected error";
 
-      if (err.graphQLErrors && err.graphQLErrors[0].message) {
-        message = err.graphQLErrors[0].message;
-      }
-      setLocalError(message);
+        if (err.graphQLErrors && err.graphQLErrors[0].message) {
+          message = err.graphQLErrors[0].message;
+        }
+        setLocalError(message);
 
-      setTimeout(() => {
-        setLocalError(null);
-      }, 3000);
-    },
-    variables: { userId: props.match.params.id },
-  });
+        setTimeout(() => {
+          setLocalError(null);
+        }, 3000);
+      },
+      variables: { userId: props.match.params.id },
+    }
+  );
 
   if (data && data.getUserInfo) user = data.getUserInfo;
 
@@ -64,9 +72,10 @@ const User = (props) => {
           {user && (
             <UserCard
               user={user}
-              refetch={refetch}
+              refetchUser={refetchUser}
               loading={loadingUser}
               showMessage={showMessage}
+              refetchPosts={refetchPosts}
             />
           )}
           {posts.map((post) => (

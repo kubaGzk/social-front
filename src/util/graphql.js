@@ -182,6 +182,34 @@ export const FETCH_USER_INFO_QUERY = gql`
       lastname
       createdAt
       image
+      description
+      friends
+      invitesSend
+      invitesReceived
+      postsCount
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation updateUser(
+    $firstname: String!
+    $lastname: String!
+    $description: String!
+    $image: Upload
+  ) {
+    updateUser(
+      firstname: $firstname
+      lastname: $lastname
+      description: $description
+      image: $image
+    ) {
+      id
+      email
+      firstname
+      lastname
+      createdAt
+      image
       friends
       invitesSend
       invitesReceived
@@ -203,5 +231,22 @@ export const CONFIRM_INVITE = gql`
 export const DECLINE_INVITE = gql`
   mutation declineInvite($requestor: ID!) {
     declineInvite(requestor: $requestor)
+  }
+`;
+
+export const FETCH_INVITES = gql`
+  query getInvitations {
+    getInvitations {
+      received {
+        firstname
+        lastname
+        image
+      }
+      sent {
+        firstname
+        lastname
+        image
+      }
+    }
   }
 `;

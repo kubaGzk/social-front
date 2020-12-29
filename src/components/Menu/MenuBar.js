@@ -7,7 +7,7 @@ import MenuItems from "./MenuItems";
 const MenuBar = (props) => {
   const { width } = useContext(DimensionContext);
 
-  const { toggleMenu } = props;
+  const { toggleMenu, toggleInvites } = props;
 
   return (
     <Menu
@@ -21,7 +21,7 @@ const MenuBar = (props) => {
       </Menu.Item>
       <Menu.Menu vertical="true" position="right">
         {width > 767 ? (
-          <MenuItems />
+          <MenuItems toggleInvites={toggleInvites} />
         ) : (
           <Menu.Item>
             <Button icon="sidebar" onClick={toggleMenu} />

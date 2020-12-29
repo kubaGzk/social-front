@@ -20,6 +20,7 @@ const AuthContext = createContext({
   login: () => {},
   logout: () => {},
   checkLocal: () => {},
+  updateUserData: () => {},
 });
 
 const authReducer = (state, action) => {
@@ -41,6 +42,14 @@ const authReducer = (state, action) => {
 
     case "ERROR":
       return { ...INITIAL_STATE, error: action.error };
+
+    case "UPDATE":
+      return {
+        ...state,
+        image: action.image,
+        firstname: action.firstname,
+        lastname: action.lastname,
+      };
 
     default:
       return state;
@@ -130,6 +139,10 @@ const AuthContextProvider = (props) => {
     }
   }, [validateToken, logout]);
 
+  const updateUserData = (firstname, lastname, image) => {
+    dispatch({ type: "UPDATE", firstname, lastname, image });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -143,6 +156,8 @@ const AuthContextProvider = (props) => {
         login: (...args) => login(...args),
         logout: () => logout(),
         checkLocal: () => checkLocal(),
+        updateUserData: (firstname, lastname, image) =>
+          updateUserData(firstname, lastname, image),
       }}
       {...props}
     />

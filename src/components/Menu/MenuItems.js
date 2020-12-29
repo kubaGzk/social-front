@@ -10,7 +10,7 @@ const MenuItems = (props) => {
   );
   const { width } = useContext(DimensionContext);
 
-  const { toggleMenu } = props;
+  const { toggleMenu, toggleInvites } = props;
 
   let menuItems = (
     <>
@@ -72,9 +72,19 @@ const MenuItems = (props) => {
             }}
           >
             <Dropdown.Menu>
-              <Dropdown.Item text="Open..." description="ctrl + o" />
+              <Dropdown.Item
+                text="Invites"
+                icon="group"
+                onClick={toggleInvites}
+              />
               <Dropdown.Divider />
-              <Dropdown.Item text="Logout" onClick={logout} as={Link} to="/" />
+              <Dropdown.Item
+                text="Logout"
+                onClick={logout}
+                as={Link}
+                to="/"
+                icon="sign-out"
+              />
             </Dropdown.Menu>
           </Dropdown>
         </Menu.Item>
@@ -103,6 +113,14 @@ const MenuItems = (props) => {
             size="mini"
           />
         </Menu.Item>
+        <Menu.Item />
+        <Menu.Item
+          name="invites"
+          onClick={() => {
+            toggleMenu();
+            toggleInvites();
+          }}
+        />
         <Menu.Item />
         <Menu.Item
           name="logout"

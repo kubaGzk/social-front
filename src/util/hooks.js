@@ -36,14 +36,17 @@ export const useGetPosts = (userId) => {
   const [dataComplete, setDataComplete] = useState(false);
   const [error, setError] = useState();
 
-  const { loading, data, fetchMore, client } = useQuery(FETCH_POSTS_QUERY, {
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data) => {
-      if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
-        setDataComplete(true);
-    },
-    variables: { userId: userId },
-  });
+  const { loading, data, fetchMore, client, refetch } = useQuery(
+    FETCH_POSTS_QUERY,
+    {
+      notifyOnNetworkStatusChange: true,
+      onCompleted: (data) => {
+        if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
+          setDataComplete(true);
+      },
+      variables: { userId: userId },
+    }
+  );
 
   let posts = [];
   if (data && data.getPosts) posts = data.getPosts;
@@ -74,5 +77,6 @@ export const useGetPosts = (userId) => {
     setError: setErrorHandler,
     posts,
     dataComplete,
+    refetch,
   };
 };
