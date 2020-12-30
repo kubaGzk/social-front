@@ -78,6 +78,10 @@
   padding: 2rem;
 }
 
+.pusher {
+  z-index: 0 !important;
+}
+
 @media (max-width: 767px) {
   .ui.container {
     margin-left: 0 !important;

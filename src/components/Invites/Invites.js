@@ -1,11 +1,14 @@
 import { useQuery } from "@apollo/client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import { Grid, Header, List, Loader, Modal } from "semantic-ui-react";
+import { DimensionContext } from "../../context/dimension";
 import { FETCH_INVITES } from "../../util/graphql";
 import InviteItems from "./InviteItems";
 
 const Invites = (props) => {
   const { showInvites, setShowInvites } = props;
+
+  const { width } = useContext(DimensionContext);
 
   const mounted = useRef(false);
 
@@ -16,7 +19,10 @@ const Invites = (props) => {
     };
   }, []);
 
-  const { data, loading } = useQuery(FETCH_INVITES, "network-only");
+  const { data, loading, refetch: refetchInvites } = useQuery(
+    FETCH_INVITES,
+    "network-only"
+  );
 
   let invites = { sent: [], received: [] };
 
@@ -38,12 +44,17 @@ const Invites = (props) => {
         {loading ? (
           <Loader />
         ) : (
-          <Grid columns={2} divided>
+          <Grid columns={width <= 767 ? 1 : 2} divided>
             <Grid.Column>
               <Grid.Row>
                 <Header>Invites Received</Header>
-                <List>
-                  <InviteItems invites={invites.received} type="RECEIVED" />
+                <List divided verticalAlign="middle">
+                  <InviteItems
+                    invites={invites.received}
+                    received
+                    refetchInvites={refetchInvites}
+                    closeModal={closeModal}
+                  />
                 </List>
               </Grid.Row>
             </Grid.Column>
@@ -51,7 +62,7 @@ const Invites = (props) => {
               <Grid.Row>
                 <Header>Invites Sent</Header>
                 <List>
-                  <InviteItems invites={invites.sent} />
+                  <InviteItems invites={invites.sent} closeModal={closeModal} />
                 </List>
               </Grid.Row>
             </Grid.Column>

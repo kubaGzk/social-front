@@ -241,11 +241,13 @@ export const FETCH_INVITES = gql`
         firstname
         lastname
         image
+        id
       }
       sent {
         firstname
         lastname
         image
+        id
       }
     }
   }

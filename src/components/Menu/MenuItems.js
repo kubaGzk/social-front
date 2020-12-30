@@ -14,7 +14,7 @@ const MenuItems = (props) => {
 
   let menuItems = (
     <>
-      {width <= 767}
+      {width <= 767 && <Menu.Item />}
       <Menu.Item name="login">
         <Button
           as={Link}

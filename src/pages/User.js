@@ -50,6 +50,7 @@ const User = (props) => {
         }, 3000);
       },
       variables: { userId: props.match.params.id },
+      fetchPolicy: "cache-and-network",
     }
   );
 
