@@ -10,36 +10,20 @@ const Invites = (props) => {
 
   const { width } = useContext(DimensionContext);
 
-  const mounted = useRef(false);
-
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  const { data, loading, refetch: refetchInvites } = useQuery(
-    FETCH_INVITES,
-    "network-only"
-  );
+  const { data, loading, refetch: refetchInvites } = useQuery(FETCH_INVITES, {
+    fetchPolicy: "cache-and-network",
+  });
 
   let invites = { sent: [], received: [] };
 
   if (data && data.getInvitations) invites = data.getInvitations;
 
   const closeModal = () => {
-    mounted.current && setShowInvites(false);
+    setShowInvites(false);
   };
 
   return (
-    <Modal
-      onClose={closeModal}
-      open={showInvites}
-      onUnmount={() => (mounted.current = false)}
-      closeIcon
-      centered={false}
-    >
+    <Modal onClose={closeModal} open={showInvites} closeIcon centered={false}>
       <Modal.Content>
         {loading ? (
           <Loader />

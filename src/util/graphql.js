@@ -252,3 +252,84 @@ export const FETCH_INVITES = gql`
     }
   }
 `;
+
+export const ON_NEW_POST = gql`
+  subscription newPost {
+    newPost {
+      id
+      type
+      body
+      image
+      createdAt
+      firstname
+      lastname
+      userImage
+      userId
+      likeCount
+      likes {
+        id
+        createdAt
+        firstname
+        lastname
+        userId
+      }
+      commentCount
+      comments {
+        id
+        createdAt
+        body
+        firstname
+        lastname
+        userId
+        image
+      }
+    }
+  }
+`;
+
+export const ON_EDIT_POST = gql`
+  subscription editedPost {
+    editedPost {
+      id
+      type
+      body
+      image
+      likeCount
+      likes {
+        id
+        createdAt
+        firstname
+        lastname
+        userId
+      }
+      commentCount
+      comments {
+        id
+        createdAt
+        body
+        firstname
+        lastname
+        userId
+        image
+      }
+    }
+  }
+`;
+
+export const ON_DEL_POST = gql`
+  subscription deletedPost {
+    deletedPost
+  }
+`;
+
+export const ON_INVITE = gql`
+  subscription invite($userId: ID!) {
+    invite(userId: $userId) {
+      id
+      firstname
+      lastname
+      type
+      image
+    }
+  }
+`;

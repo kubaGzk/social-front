@@ -11,6 +11,7 @@ import {
   Loader,
 } from "semantic-ui-react";
 import { AuthContext } from "../../context/auth";
+import { MessageContext } from "../../context/message";
 import EditProfile from "../../forms/EditProfile";
 import {
   CONFIRM_INVITE,
@@ -35,10 +36,11 @@ const UserCard = (props) => {
     loading,
     refetchUser,
     showMessage,
-    refetchPosts
+    refetchPosts,
   } = props;
 
   const { userId, token } = useContext(AuthContext);
+  const { addMessage } = useContext(MessageContext);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -48,7 +50,7 @@ const UserCard = (props) => {
     },
     variables: { receiver: id },
     update(c, { data: { createInvite } }) {
-      showMessage(createInvite);
+      addMessage(createInvite, "Invite", "info");
       refetchUser();
     },
   });
@@ -59,7 +61,7 @@ const UserCard = (props) => {
     },
     variables: { requestor: id },
     update(c, { data: { confirmInvite } }) {
-      showMessage(confirmInvite);
+      addMessage(confirmInvite, "Invite", "info");
       refetchUser();
     },
   });
@@ -70,7 +72,7 @@ const UserCard = (props) => {
     },
     variables: { requestor: id },
     update(c, { data: { declineInvite } }) {
-      showMessage(declineInvite);
+      addMessage(declineInvite, "Invite", "info");
       refetchUser();
     },
   });

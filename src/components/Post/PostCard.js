@@ -50,15 +50,6 @@ const PostCard = (props) => {
   const [commentBody, setCommentBody] = useState("");
 
   const [delPost, { loading: dpLoading }] = useMutation(DELETE_POST_MUTATION, {
-    update(cache) {
-      let postKey;
-
-      for (let key in cache.data.data) {
-        if (cache.data.data[key].id === id) postKey = key;
-      }
-
-      cache.data.delete(postKey);
-    },
     onError(err) {
       console.log(err);
       showError("Error");
@@ -109,6 +100,11 @@ const PostCard = (props) => {
     delComment({ variables: { postId: id, commentId } });
   };
 
+  let invertedLike = false;
+
+  if (likes.findIndex((like) => like.userId === localUser) !== -1)
+    invertedLike = true;
+
   let cardContent;
 
   switch (type) {
@@ -119,6 +115,7 @@ const PostCard = (props) => {
             floated="left"
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
+            style={{ borderRadius: "0.25rem" }}
           />
           <Card.Header
             as={Link}
@@ -138,6 +135,7 @@ const PostCard = (props) => {
             floated="left"
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
+            style={{ borderRadius: "0.25rem" }}
           />
           <Card.Header
             as={Link}
@@ -161,7 +159,8 @@ const PostCard = (props) => {
             floated="left"
             size="mini"
             src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
-          />
+            style={{ borderRadius: "0.25rem" }}
+        />
           <Card.Header
             as={Link}
             to={`/user/${userId}`}
@@ -188,7 +187,7 @@ const PostCard = (props) => {
                 labelPosition="right"
                 onClick={() => localUser && addLike()}
               >
-                <Button color="teal" basic>
+                <Button color="teal" basic={!invertedLike}>
                   <Icon name="heart" />
                 </Button>
 

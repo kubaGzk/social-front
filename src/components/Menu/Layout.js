@@ -1,17 +1,106 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Sidebar, Grid, Menu, Segment } from "semantic-ui-react";
 import { DimensionContext } from "../../context/dimension";
 import Invites from "../Invites/Invites";
 import MenuBar from "./MenuBar";
 import MenuItems from "./MenuItems";
+import Messages from "../Message/Messages";
+import { MessageContext } from "../../context/message";
+import { AuthContext } from "../../context/auth";
+import { useApolloClient, useSubscription } from "@apollo/client";
+import { FETCH_USER_INFO_QUERY, ON_INVITE } from "../../util/graphql";
 
 const Layout = (props) => {
   const { children } = props;
 
   const { width } = useContext(DimensionContext);
+  const { addMessage } = useContext(MessageContext);
+  const { userId, token } = useContext(AuthContext);
+
+  const client = useApolloClient();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const [showInvites, setShowInvites] = useState(false);
+
+  const { data, loading } = useSubscription(ON_INVITE, {
+    variables: { userId },
+    skip: !!!token,
+  });
+
+  useEffect(() => {
+    if (data && data.invite) {
+      switch (data.invite.type) {
+        case "RECEIVED":
+          addMessage(
+            `You have new invite from ${data.invite.firstname} ${data.invite.lastname}.`,
+            "Invitation",
+            "info",
+            () => setShowInvites(true)
+          );
+
+          let clientDataA = client.cache.readQuery({
+            query: FETCH_USER_INFO_QUERY,
+            variables: { userId: data.invite.id },
+          });
+
+          if (clientDataA.getUserInfo) {
+            const newInvites = [...clientDataA.getUserInfo.invitesSend];
+            newInvites.push(userId);
+
+            client.cache.writeQuery({
+              query: FETCH_USER_INFO_QUERY,
+              variables: { userId: data.invite.id },
+              data: {
+                ...clientDataA,
+                getUserInfo: {
+                  ...clientDataA.getUserInfo,
+                  invitesSend: newInvites,
+                },
+              },
+            });
+          }
+
+          break;
+        case "CONFIRMED":
+          addMessage(
+            `You are now friends with ${data.invite.firstname} ${data.invite.lastname}.`,
+            "Invitation",
+            "info"
+          );
+
+          let clientDataB = client.cache.readQuery({
+            query: FETCH_USER_INFO_QUERY,
+            variables: { userId: data.invite.id },
+          });
+
+          if (clientDataB.getUserInfo) {
+            const newInvites = [
+              ...clientDataB.getUserInfo.invitesReceived,
+            ].filter((inv) => inv !== userId);
+
+            const newFriends = [...clientDataB.getUserInfo.friends, userId];
+
+            client.cache.writeQuery({
+              query: FETCH_USER_INFO_QUERY,
+              variables: { userId: data.invite.id },
+              data: {
+                ...clientDataB,
+                getUserInfo: {
+                  ...clientDataB.getUserInfo,
+                  invitesReceived: newInvites,
+                  friends: newFriends,
+                },
+              },
+            });
+          }
+
+          break;
+
+        default:
+          break;
+      }
+    }
+  }, [data]);
 
   const toggleSidebarMenu = () => {
     setShowSidebar((p) => !p);
@@ -56,6 +145,7 @@ const Layout = (props) => {
               </Segment>
             </Sidebar.Pusher>
           </Sidebar.Pushable>
+          <Messages />
         </Grid.Column>
       </Grid>
       {showInvites && (

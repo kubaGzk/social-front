@@ -1,8 +1,14 @@
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
 import { useContext, useState, useEffect, useCallback } from "react";
 import { AuthContext } from "../context/auth";
 import { DimensionContext } from "../context/dimension";
-import { FETCH_POSTS_QUERY } from "./graphql";
+import { MessageContext } from "../context/message";
+import {
+  FETCH_POSTS_QUERY,
+  ON_DEL_POST,
+  ON_EDIT_POST,
+  ON_NEW_POST,
+} from "./graphql";
 
 export const useForm = (callback, initialState = {}) => {
   const [values, setValues] = useState(initialState);
@@ -31,16 +37,21 @@ export const useForm = (callback, initialState = {}) => {
 export const useGetPosts = (userId) => {
   const { token } = useContext(AuthContext);
   const { height, scrollY, scrollHeight } = useContext(DimensionContext);
+  const { addMessage } = useContext(MessageContext);
 
   const [postsOffset, setOffset] = useState(0);
   const [dataComplete, setDataComplete] = useState(false);
   const [error, setError] = useState();
 
-  const { loading, data, fetchMore, client, refetch } = useQuery(
+  const client = useApolloClient();
+
+  const { loading, data, fetchMore, refetch, subscribeToMore } = useQuery(
     FETCH_POSTS_QUERY,
     {
       notifyOnNetworkStatusChange: true,
       onCompleted: (data) => {
+        console.log(data.getPosts.length, postsOffset);
+
         if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
           setDataComplete(true);
       },
@@ -69,6 +80,56 @@ export const useGetPosts = (userId) => {
       setError(null);
     }, 5000);
   };
+
+  const subscribeToNewPost = () => {
+    subscribeToMore({
+      document: ON_NEW_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return { getPosts: [] };
+        const newPost = subscriptionData.data.newPost;
+        return { getPosts: [newPost] };
+      },
+    });
+  };
+
+  const subscribeToEditPost = () => {
+    subscribeToMore({
+      document: ON_EDIT_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return { getPosts: [] };
+        const editedPost = subscriptionData.data.editedPost;
+
+        if (prev.getPosts.findIndex((pst) => pst.id === editedPost.id) === -1)
+          return prev;
+
+        return { getPosts: [editedPost] };
+      },
+    });
+  };
+
+  const subscribeToDeletePost = () => {
+    subscribeToMore({
+      document: ON_DEL_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (subscriptionData) {
+          const postId = subscriptionData.data.deletedPost;
+          let postKey;
+          for (let key in client.cache.data.data) {
+            if (client.cache.data.data[key].id === postId) postKey = key;
+          }
+          client.cache.data.delete(postKey);
+        }
+
+        return { getPosts: [] };
+      },
+    });
+  };
+
+  useEffect(() => {
+    subscribeToNewPost();
+    subscribeToEditPost();
+    subscribeToDeletePost();
+  }, []);
 
   return {
     isAuth: !!token,

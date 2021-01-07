@@ -44,7 +44,7 @@ function App() {
         <Layout>
           <Container className="body-container">
             <Switch>
-              {routes}
+              {!loading && routes}
               <Redirect to="/" />
             </Switch>
           </Container>
