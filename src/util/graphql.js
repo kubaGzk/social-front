@@ -161,6 +161,40 @@ export const CREATE_POST = gql`
   }
 `;
 
+export const EDIT_POST = gql`
+  mutation editPost($postId: ID!, $body: String, $image: Upload) {
+    editPost(postId: $postId, body: $body, image: $image) {
+      id
+      type
+      body
+      image
+      createdAt
+      firstname
+      lastname
+      userImage
+      userId
+      likeCount
+      likes {
+        id
+        createdAt
+        firstname
+        lastname
+        userId
+      }
+      commentCount
+      comments {
+        id
+        createdAt
+        body
+        firstname
+        lastname
+        userId
+        image
+      }
+    }
+  }
+`;
+
 export const VALIDATE_TOKEN = gql`
   mutation validate {
     validateToken {
@@ -168,6 +202,17 @@ export const VALIDATE_TOKEN = gql`
       email
       lastname
       firstname
+      image
+    }
+  }
+`;
+
+export const FETCH_USER_LIST = gql`
+  query getUserList($text: String!) {
+    getUserList(text: $text) {
+      id
+      firstname
+      lastname
       image
     }
   }

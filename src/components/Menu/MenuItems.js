@@ -1,16 +1,86 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import { Button, Icon, Input, Label, Menu, Dropdown } from "semantic-ui-react";
+import { useLazyQuery } from "@apollo/client";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Link, useHistory } from "react-router-dom";
+import {
+  Button,
+  Icon,
+  Input,
+  Label,
+  Menu,
+  Dropdown,
+  Search,
+} from "semantic-ui-react";
 import { AuthContext } from "../../context/auth";
 import { DimensionContext } from "../../context/dimension";
+import { FETCH_USER_LIST } from "../../util/graphql";
 
 const MenuItems = (props) => {
+  const { toggleMenu, toggleInvites } = props;
+
   const { token, logout, firstname, lastname, image, userId } = useContext(
     AuthContext
   );
   const { width } = useContext(DimensionContext);
 
-  const { toggleMenu, toggleInvites } = props;
+  const timeoutRef = useRef();
+  const searchValRef = useRef();
+  const [searchVal, setSearchVal] = useState("");
+  const [results, setResults] = useState([]);
+
+  searchValRef.current = searchVal;
+
+  const [fetchUserList, { loading }] = useLazyQuery(FETCH_USER_LIST, {
+    fetchPolicy: "no-cache",
+    onCompleted: (data) => {
+      setResults(() => {
+        if (data.getUserList.length < 1) {
+          return [{ title: "No results" }];
+        }
+
+        return data.getUserList.map((el) => {
+          return {
+            title: `${el.firstname} ${el.lastname}`,
+            image: process.env.REACT_APP_IMAGES_URL + "/" + el.image,
+            id: el.id,
+          };
+        });
+      });
+    },
+  });
+
+  const handleSearchChange = useCallback((e, data) => {
+    setSearchVal(e.target.value);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      searchValRef.current.length > 0 &&
+        fetchUserList({ variables: { text: searchValRef.current } });
+    }, 500);
+  }, []);
+
+  const history = useHistory();
+
+  const search = (
+    <Search
+      loading={loading}
+      onResultSelect={(e, data) => {
+        toggleMenu && toggleMenu();
+        data.result.id && history.push(`/user/${data.result.id}`);
+      }}
+      placeholder={"Search for friend..."}
+      onSearchChange={handleSearchChange}
+      results={results}
+      size="mini"
+      value={searchVal}
+      className="user-search"
+      showNoResults={false}
+    />
+  );
 
   let menuItems = (
     <>
@@ -33,12 +103,7 @@ const MenuItems = (props) => {
   if (token && width > 767) {
     menuItems = (
       <>
-        <Menu.Item style={{ maxWidth: "80%" }}>
-          <Input
-            action={{ type: "submit", content: <Icon name="search" /> }}
-            placeholder="Search for friend..."
-          />
-        </Menu.Item>
+        <Menu.Item style={{ maxWidth: "80%" }}>{search}</Menu.Item>
         <Menu.Item style={{ maxWidth: "13rem" }}>
           <Label
             as={Link}
@@ -106,13 +171,7 @@ const MenuItems = (props) => {
           </Label>
         </Menu.Item>
         <Menu.Item />
-        <Menu.Item style={{ width: "100%" }}>
-          <Input
-            action={{ type: "submit", content: <Icon name="search" /> }}
-            placeholder="Search for friend..."
-            size="mini"
-          />
-        </Menu.Item>
+        <Menu.Item style={{ width: "100%" }}>{search}</Menu.Item>
         <Menu.Item />
         <Menu.Item
           name="invites"

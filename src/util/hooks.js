@@ -50,8 +50,6 @@ export const useGetPosts = (userId) => {
     {
       notifyOnNetworkStatusChange: true,
       onCompleted: (data) => {
-        console.log(data.getPosts.length, postsOffset);
-
         if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
           setDataComplete(true);
       },
@@ -64,11 +62,16 @@ export const useGetPosts = (userId) => {
 
   useEffect(() => {
     postsOffset !== posts.length && setOffset(posts.length);
-  }, [posts]);
+  }, [posts, data]);
 
   useEffect(() => {
     //56px - Loader size
-    if (height + scrollY + 56 >= scrollHeight && !loading && !dataComplete) {
+    if (
+      height + scrollY + 56 >= scrollHeight &&
+      !loading &&
+      !dataComplete &&
+      postsOffset !== 0
+    ) {
       fetchMore({ variables: { offset: postsOffset } });
     }
   }, [height, scrollY, scrollHeight]);
