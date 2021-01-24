@@ -298,6 +298,44 @@ export const FETCH_INVITES = gql`
   }
 `;
 
+export const FETCH_CHAT = gql`
+  query getChat($chatId: ID!) {
+    getChat(chatId: $chatId) {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      messages {
+        id
+        body
+        user
+        createdAt
+        read
+      }
+      writing
+      unread
+    }
+  }
+`;
+
+export const FETCH_CHATS = gql`
+  query getChats {
+    getChats {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      unread
+    }
+  }
+`;
+
 export const ON_NEW_POST = gql`
   subscription newPost {
     newPost {
@@ -368,8 +406,8 @@ export const ON_DEL_POST = gql`
 `;
 
 export const ON_INVITE = gql`
-  subscription invite($userId: ID!) {
-    invite(userId: $userId) {
+  subscription invite {
+    invite {
       id
       firstname
       lastname

@@ -1,8 +1,14 @@
 import { useMutation } from "@apollo/react-hooks";
-import React, { createContext, useCallback, useReducer } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useReducer,
+} from "react";
 import jwtDecode from "jwt-decode";
 import { VALIDATE_TOKEN } from "../util/graphql";
 import { useApolloClient } from "@apollo/client";
+import { WebSocketLink } from "@apollo/client/link/ws";
 
 const INITIAL_STATE = {
   token: null,
@@ -69,8 +75,13 @@ const AuthContextProvider = (props) => {
     localStorage.removeItem("expiresIn");
 
     client.resetStore();
-
     dispatch({ type: "LOGOUT" });
+
+    props.wsLink.subscriptionClient.close(true, true);
+    setTimeout(() => {
+      props.wsLink.subscriptionClient.connect();
+    });
+
   };
 
   const login = (
@@ -94,6 +105,13 @@ const AuthContextProvider = (props) => {
       userId: funUserId,
       email: funEmail,
     });
+
+    props.wsLink.subscriptionClient.close(true, true);
+
+    setTimeout(() => {
+      props.wsLink.subscriptionClient.connect();
+    });
+
     setTimeout(() => {
       logout();
     }, expirationDate);
@@ -142,6 +160,11 @@ const AuthContextProvider = (props) => {
   const updateUserData = (firstname, lastname, image) => {
     dispatch({ type: "UPDATE", firstname, lastname, image });
   };
+
+  // useEffect(() => {
+  //   props.wsLink.subscriptionClient.close(true, true);
+  //   props.wsLink.subscriptionClient.connect();
+  // }, [token]);
 
   return (
     <AuthContext.Provider
