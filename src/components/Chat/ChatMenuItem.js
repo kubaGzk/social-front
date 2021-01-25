@@ -18,23 +18,21 @@ const ChatMenuItem = (props) => {
     );
   }
 
-  console.log(chat);
+  const chatName = chat.users
+    .filter((user) => user.id !== userId)
+    .map((user, ind) => {
+      if (ind > 0) {
+        return `, ${user.firstname} ${user.lastname}`;
+      }
+      return `${user.firstname} ${user.lastname}`;
+    });
 
   return (
-    <Feed.Event>
+    <Feed.Event >
       <Feed.Label>{chatIcon}</Feed.Label>
-      <Feed.Content onClick={() => setOpenChat(chat.id)}>
+      <Feed.Content  onClick={() => setOpenChat(chat.id, chatName)}>
         <Feed.Summary>
-          <Feed.User>
-            {chat.users
-              .filter((user) => user.id !== userId)
-              .map((user, ind) => {
-                if (ind > 0) {
-                  return `, ${user.firstname} ${user.lastname}`;
-                }
-                return `${user.firstname} ${user.lastname}`;
-              })}
-          </Feed.User>
+          <Feed.User>{chatName}</Feed.User>
         </Feed.Summary>
         <Feed.Meta>{chat.unread} unread messages</Feed.Meta>
       </Feed.Content>

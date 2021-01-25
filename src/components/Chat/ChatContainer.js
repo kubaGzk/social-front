@@ -2,7 +2,11 @@ import { useQuery } from "@apollo/client";
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Button, Popup, Ref } from "semantic-ui-react";
 import { DimensionContext } from "../../context/dimension";
-import { FETCH_CHATS } from "../../util/graphql";
+import {
+  FETCH_CHATS,
+  ON_CHANGE_CHAT_LIST,
+  ON_NEW_CHAT,
+} from "../../util/graphql";
 import ChatMenu from "./ChatMenu";
 
 const ChatContainer = (props) => {
@@ -10,36 +14,74 @@ const ChatContainer = (props) => {
 
   const [show, setShow] = useState(false);
   const [openChat, setOpenChat] = useState();
+  const [openChatName, setOpenChatName] = useState("");
   const btnRef = useRef();
   const menuRef = useRef();
 
   const onClickHandler = (e) => {
-    setShow((prevShow) => {
-      if (menuRef.current.contains(e.target)) {
-        return true;
-      }
-      if (!prevShow && btnRef.current.contains(e.target)) {
-        return true;
-      }
-      return false;
-    });
+    if (
+      !menuRef.current.contains(e.target) &&
+      !btnRef.current.contains(e.target) &&
+      e.target.id !== "close-chat" &&
+      e.target.id !== "close-chat-icon"
+    ) {
+      setShow(false);
+      setOpenChat(null);
+      setOpenChatName("");
+    }
   };
 
-  useEffect(() => {
-    window.addEventListener("click", onClickHandler);
+  const { data, loading, subscribeToMore, error } = useQuery(FETCH_CHATS, {
+    fetchPolicy: "cache-and-network",
+  });
 
+  useEffect(() => {
+    subscribeToMore({
+      document: ON_NEW_CHAT,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const newChat = subscriptionData.data.newChat;
+        return { ...prev, getChats: [...prev.getChats, newChat] };
+      },
+    });
+
+    subscribeToMore({
+      document: ON_CHANGE_CHAT_LIST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const chatChange = subscriptionData.data.chatChange;
+        const newChats = [...prev.getChats].map((chat) => {
+          if (chat.id === chatChange.id) {
+            return chatChange;
+          } else {
+            return chat;
+          }
+        });
+        return { ...prev, getChats: newChats };
+      },
+    });
+
+    window.addEventListener("click", onClickHandler);
     return () => window.removeEventListener("click", onClickHandler);
   }, []);
 
-  const openChatHandler = (chatId) => {
+  const openChatHandler = (chatId, name) => {
     setOpenChat(chatId);
-
+    setOpenChatName(name || "");
     if (width <= 767) {
       setShow(false);
     }
   };
 
-  const { data, loading } = useQuery(FETCH_CHATS);
+  const chatButtonHandler = () => {
+    setShow((p) => !p);
+    if (width <= 767) {
+      setOpenChat(null);
+      setOpenChatName("");
+    }
+  };
 
   let chats = [];
 
@@ -56,6 +98,7 @@ const ChatContainer = (props) => {
           className="chat-button"
           size="huge"
           color="blue"
+          onClick={chatButtonHandler}
         />
       </Ref>
       <ChatMenu
@@ -65,6 +108,7 @@ const ChatContainer = (props) => {
         chats={chats}
         chatsLoading={loading}
         setOpenChat={openChatHandler}
+        openChatName={openChatName}
       />
     </div>
   );

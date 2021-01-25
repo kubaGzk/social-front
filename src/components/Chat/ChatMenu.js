@@ -4,16 +4,23 @@ import ChatMenuItem from "./ChatMenuItem";
 import ChatWindow from "./ChatWindow";
 
 const ChatMenu = forwardRef((props, ref) => {
-  const { chats, show, openChat, chatsLoading, setOpenChat } = props;
+  const {
+    chats,
+    show,
+    openChat,
+    chatsLoading,
+    setOpenChat,
+    openChatName,
+  } = props;
 
-  const classes = ["chat-menu"];
+  const cardClasses = [];
   if (!show) {
-    classes.push("chat-none");
+    cardClasses.push("display-none");
   }
 
   return (
-    <div className={classes.join(" ")} ref={ref}>
-      <Card>
+    <div className="chat-menu" ref={ref}>
+      <Card className={cardClasses.join(" ")}>
         <Card.Content style={{ height: "10%", padding: "0.5em" }}>
           <div
             style={{
@@ -28,9 +35,7 @@ const ChatMenu = forwardRef((props, ref) => {
             </Button>
           </div>
         </Card.Content>
-        {chatsLoading || !chats ? (
-          <Loader />
-        ) : (
+        {chats && (
           <Card.Content style={{ height: "90%", overflowY: "scroll" }}>
             <Feed>
               {chats.length > 0
@@ -47,7 +52,13 @@ const ChatMenu = forwardRef((props, ref) => {
         )}
       </Card>
 
-      {openChat && <ChatWindow chatId={openChat} />}
+      {openChat && (
+        <ChatWindow
+          setOpenChat={setOpenChat}
+          chatId={openChat}
+          openChatName={openChatName}
+        />
+      )}
     </div>
   );
 });

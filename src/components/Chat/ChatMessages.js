@@ -1,28 +1,50 @@
 import React, { useEffect } from "react";
+import moment from "moment";
 import { Comment } from "semantic-ui-react";
 
 const ChatMessages = (props) => {
-  const { messages } = props;
+  const { messages, users, writing } = props;
 
   useEffect(() => {
-    const chMsgElement = document.findElementById("chat-messages");
+    const chMsgElement = document.getElementById("chat-messages");
     console.log(chMsgElement);
   }, [messages]);
 
-  return messages.length > 0 ? (
-    <div id="chat-messages">
-      {messages.map((msg) => (
-        <Comment>
-          <Comment.Avatar src="https://react.semantic-ui.com/images/avatar/small/joe.jpg" />
-          <Comment.Content>
-            <Comment.Text>Dude, this is awesome. Thanks so much</Comment.Text>
-            <Comment.Metadata>5 days ago</Comment.Metadata>
-          </Comment.Content>
-        </Comment>
+  const userNames = {};
+  const userImages = {};
+
+  for (const usr of users) {
+    userNames[usr.id] = usr.firstname;
+    userImages[usr.id] = usr.image;
+  }
+
+  return (
+    <>
+      {messages.length > 0 ? (
+        <div id="chat-messages">
+          {messages.map((msg) => (
+            <Comment key={msg.id}>
+              <Comment.Avatar
+                src={
+                  process.env.REACT_APP_IMAGES_URL + "/" + userImages[msg.user]
+                }
+              />
+              <Comment.Content>
+                <Comment.Text>{msg.body}</Comment.Text>
+                <Comment.Metadata>
+                  {moment(msg.createdAt).fromNow(true)}
+                </Comment.Metadata>
+              </Comment.Content>
+            </Comment>
+          ))}
+        </div>
+      ) : (
+        "No messages to display"
+      )}
+      {writing.map((id) => (
+        <p>{userNames[id]} is writing...</p>
       ))}
-    </div>
-  ) : (
-    "No messages to display"
+    </>
   );
 };
 

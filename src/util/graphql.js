@@ -416,3 +416,56 @@ export const ON_INVITE = gql`
     }
   }
 `;
+
+export const ON_NEW_CHAT = gql`
+  subscription newChat {
+    newChat {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      unread
+    }
+  }
+`;
+
+export const ON_CHANGE_CHAT_LIST = gql`
+  subscription chatChange {
+    chatChange {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      unread
+    }
+  }
+`;
+
+export const ON_CHANGE_CHAT = gql`
+  subscription chatChange {
+    chatChange {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      messages {
+        id
+        body
+        user
+        createdAt
+        read
+      }
+      writing
+      unread
+    }
+  }
+`;

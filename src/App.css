@@ -114,12 +114,12 @@
   height: 60vh;
 }
 
-.chat-menu div.ui.card {
-  margin: 0.2rem 0;
+.display-none {
+  display: none !important;
 }
 
-.chat-none {
-  display: none;
+.chat-menu div.ui.card {
+  margin: 0.2rem 0;
 }
 
 @media (max-width: 767px) {
