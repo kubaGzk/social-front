@@ -1,8 +1,9 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Button, Popup, Ref } from "semantic-ui-react";
 import { DimensionContext } from "../../context/dimension";
 import {
+  END_WRITING,
   FETCH_CHATS,
   ON_CHANGE_CHAT_LIST,
   ON_NEW_CHAT,
@@ -15,6 +16,7 @@ const ChatContainer = (props) => {
   const [show, setShow] = useState(false);
   const [openChat, setOpenChat] = useState();
   const [openChatName, setOpenChatName] = useState("");
+  const [openCreateGroup, setOpenCreateGroup] = useState(false);
   const btnRef = useRef();
   const menuRef = useRef();
 
@@ -109,6 +111,8 @@ const ChatContainer = (props) => {
         chatsLoading={loading}
         setOpenChat={openChatHandler}
         openChatName={openChatName}
+        setOpenCreateGroup={setOpenCreateGroup}
+        openCreateGroup={openCreateGroup}
       />
     </div>
   );

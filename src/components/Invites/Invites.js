@@ -23,7 +23,7 @@ const Invites = (props) => {
   };
 
   return (
-    <Modal onClose={closeModal} open={showInvites} closeIcon centered={false}>
+    <Modal onClose={closeModal} open={true} closeIcon centered={false}>
       <Modal.Content>
         {loading ? (
           <Loader />

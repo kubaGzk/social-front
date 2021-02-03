@@ -64,24 +64,25 @@ const authReducer = (state, action) => {
 
 const AuthContextProvider = (props) => {
   const [
-    { token, username, firstname, lastname, image, userId, email, error },
+    { token, firstname, lastname, image, userId, email, error },
     dispatch,
   ] = useReducer(authReducer, INITIAL_STATE);
 
   const client = useApolloClient();
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("expiresIn");
-
-    client.resetStore();
     dispatch({ type: "LOGOUT" });
+
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("expiresIn");
+      client.resetStore();
+    });
 
     props.wsLink.subscriptionClient.close(true, true);
     setTimeout(() => {
       props.wsLink.subscriptionClient.connect();
     });
-
   };
 
   const login = (
@@ -160,11 +161,6 @@ const AuthContextProvider = (props) => {
   const updateUserData = (firstname, lastname, image) => {
     dispatch({ type: "UPDATE", firstname, lastname, image });
   };
-
-  // useEffect(() => {
-  //   props.wsLink.subscriptionClient.close(true, true);
-  //   props.wsLink.subscriptionClient.connect();
-  // }, [token]);
 
   return (
     <AuthContext.Provider

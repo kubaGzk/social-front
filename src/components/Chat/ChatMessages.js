@@ -1,14 +1,11 @@
-import React, { useEffect } from "react";
-import moment from "moment";
-import { Comment } from "semantic-ui-react";
+import React, { useEffect, useContext, useState, useRef } from "react";
+import ChatMessage from "./ChatMessage";
+import { AuthContext } from "../../context/auth";
 
 const ChatMessages = (props) => {
   const { messages, users, writing } = props;
 
-  useEffect(() => {
-    const chMsgElement = document.getElementById("chat-messages");
-    console.log(chMsgElement);
-  }, [messages]);
+  const { userId } = useContext(AuthContext);
 
   const userNames = {};
   const userImages = {};
@@ -18,32 +15,59 @@ const ChatMessages = (props) => {
     userImages[usr.id] = usr.image;
   }
 
+  const [scrollBottom, setScrollBottom] = useState(false);
+
+  const onScrollEvent = (e) => {
+    const scrollTop = Math.round(Math.abs(e.target.scrollTop));
+    const clientHeight = e.target.clientHeight;
+    const scrollHeight = e.target.scrollHeight;
+
+    if (scrollTop + clientHeight + 5 >= scrollHeight) {
+      setScrollBottom(true);
+    } else {
+      setScrollBottom(false);
+    }
+  };
+
+  useEffect(() => {
+    const el = document.getElementById("chat-messages-content");
+    el.scrollTop = el.scrollHeight - el.clientHeight;
+    setScrollBottom(true);
+
+    el.addEventListener("scroll", onScrollEvent);
+    return () => {
+      el.removeEventListener("scroll", onScrollEvent);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (scrollBottom) {
+      const el = document.getElementById("chat-messages-content");
+      el.scrollTop = el.scrollHeight - el.clientHeight;
+      setScrollBottom(true);
+    }
+  }, [messages, writing]);
+
   return (
     <>
       {messages.length > 0 ? (
         <div id="chat-messages">
           {messages.map((msg) => (
-            <Comment key={msg.id}>
-              <Comment.Avatar
-                src={
-                  process.env.REACT_APP_IMAGES_URL + "/" + userImages[msg.user]
-                }
-              />
-              <Comment.Content>
-                <Comment.Text>{msg.body}</Comment.Text>
-                <Comment.Metadata>
-                  {moment(msg.createdAt).fromNow(true)}
-                </Comment.Metadata>
-              </Comment.Content>
-            </Comment>
+            <ChatMessage
+              message={msg}
+              userImages={userImages}
+              key={msg.id}
+              userId={userId}
+            />
           ))}
         </div>
       ) : (
         "No messages to display"
       )}
-      {writing.map((id) => (
-        <p>{userNames[id]} is writing...</p>
-      ))}
+      {writing &&
+        writing.map((id) =>
+          id !== userId ? <p key={id}>{userNames[id]} is writing...</p> : ""
+        )}
     </>
   );
 };

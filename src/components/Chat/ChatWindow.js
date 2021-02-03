@@ -1,37 +1,64 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
+import { Comment, Input, Form, Card, Button, Icon } from "semantic-ui-react";
+import { AuthContext } from "../../context/auth";
 import {
-  Comment,
-  Input,
-  Form,
-  Card,
-  Loader,
-  Button,
-  Icon,
-} from "semantic-ui-react";
-import { FETCH_CHAT, ON_CHANGE_CHAT } from "../../util/graphql";
+  END_WRITING,
+  FETCH_CHAT,
+  ON_CHANGE_CHAT,
+  READ_MESSAGE,
+  START_WRITING,
+  WRITE_MESSAGE,
+} from "../../util/graphql";
 import ChatMessages from "./ChatMessages";
 
 const ChatWindow = (props) => {
   const { chatId, openChatName, setOpenChat } = props;
+
+  const { userId } = useContext(AuthContext);
+
+  const [textMessage, setTextMessage] = useState("");
 
   const { data, subscribeToMore } = useQuery(FETCH_CHAT, {
     variables: { chatId },
     fetchPolicy: "cache-and-network",
   });
 
+  const [startWriting] = useMutation(START_WRITING, {
+    variables: { chatId },
+  });
+  const [endWriting] = useMutation(END_WRITING);
+  const [sendMessage] = useMutation(WRITE_MESSAGE, {
+    variables: { chatId: chatId, body: textMessage },
+  });
+  const [readMessage] = useMutation(READ_MESSAGE, {
+    variables: { chatId },
+  });
+
   useEffect(() => {
-    subscribeToMore({
+    const unsubscribe = subscribeToMore({
       document: ON_CHANGE_CHAT,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
 
-        console.log(prev, subscriptionData.data.chatChange);
+        if (
+          prev.getChat.id !== subscriptionData.data.chatChange.id &&
+          chatId !== subscriptionData.data.chatChange.id
+        )
+          return prev;
+
         const chatChange = subscriptionData.data.chatChange;
         return { ...prev, getChat: chatChange };
       },
     });
-  }, []);
+
+    setTextMessage("");
+
+    return () => {
+      unsubscribe();
+      endWriting({ variables: { chatId } });
+    };
+  }, [chatId]);
 
   let chat;
 
@@ -39,9 +66,44 @@ const ChatWindow = (props) => {
     chat = data.getChat;
   }
 
+  const timeoutRef = useRef();
+
+  const writingHandler = (e) => {
+    setTextMessage(e.target.value);
+
+    if (chat.writing.indexOf(userId) < 0) {
+      startWriting();
+    }
+
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      console.log("timeout");
+      endWriting({ variables: { chatId: chatId } });
+    }, 2000);
+  };
+
+  const sendHandler = () => {
+    if (textMessage.length > 0) {
+      sendMessage();
+      setTextMessage("");
+    }
+  };
+
+  useEffect(() => {
+    const unread = [];
+
+    if (chat) {
+      unread.push(...chat.unread);
+    }
+
+    if (unread.length > 0) {
+      readMessage({ variables: { messageIds: chat.unread } });
+    }
+  }, [chat]);
+
   return (
     <Card>
-      <Card.Content style={{ height: "10%", padding: "0.5em" }}>
+      <Card.Content style={{ height: "45px", padding: "0.5em" }}>
         <div
           style={{
             display: "flex",
@@ -60,7 +122,10 @@ const ChatWindow = (props) => {
           </Button>
         </div>
       </Card.Content>
-      <Card.Content style={{ height: "75%", overflowY: "scroll" }}>
+      <Card.Content
+        style={{ height: "100%", overflowY: "scroll", boxSizing: "border-box" }}
+        id="chat-messages-content"
+      >
         <Comment.Group size="mini">
           {chat && (
             <ChatMessages
@@ -72,16 +137,19 @@ const ChatWindow = (props) => {
         </Comment.Group>
       </Card.Content>
 
-      <Card.Content style={{ height: "15%" }}>
+      <Card.Content style={{ height: "60px" }}>
         <Form reply>
           <Input
             action={{
               color: "teal",
               icon: "send",
+              onClick: sendHandler,
             }}
             size="small"
             actionPosition="left"
             placeholder="Message..."
+            value={textMessage}
+            onChange={writingHandler}
           />
         </Form>
       </Card.Content>

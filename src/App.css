@@ -122,10 +122,42 @@
   margin: 0.2rem 0;
 }
 
+.chat-message {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.chat-message .content {
+  background-color: aliceblue;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  margin-left: 0.5em !important;
+}
+
+.chat-message-own {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.chat-message-own .content {
+  background-color: aliceblue;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  margin-right: 0.5em !important;
+  margin-left: 0 !important;
+}
+
 @media (max-width: 767px) {
   .ui.container {
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+
+  #file-uploader {
+    max-width: 220px;
   }
 }
 

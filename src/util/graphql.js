@@ -336,6 +336,54 @@ export const FETCH_CHATS = gql`
   }
 `;
 
+export const WRITE_MESSAGE = gql`
+  mutation writeMessage($chatId: ID!, $body: String!) {
+    writeMessage(chatId: $chatId, body: $body) {
+      id
+      messages {
+        id
+        body
+        user
+        createdAt
+        read
+      }
+      writing
+    }
+  }
+`;
+
+export const START_WRITING = gql`
+  mutation startWriting($chatId: ID!) {
+    startWriting(chatId: $chatId) {
+      id
+      writing
+    }
+  }
+`;
+export const END_WRITING = gql`
+  mutation endWriting($chatId: ID!) {
+    endWriting(chatId: $chatId) {
+      id
+      messages {
+        id
+        body
+        user
+        createdAt
+        read
+      }
+    }
+  }
+`;
+
+export const READ_MESSAGE = gql`
+  mutation readMessage($chatId: ID!, $messageIds: [ID!]) {
+    readMessage(chatId: $chatId, messageIds: $messageIds) {
+      id
+      writing
+    }
+  }
+`;
+
 export const ON_NEW_POST = gql`
   subscription newPost {
     newPost {

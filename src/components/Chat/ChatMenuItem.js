@@ -28,13 +28,13 @@ const ChatMenuItem = (props) => {
     });
 
   return (
-    <Feed.Event >
+    <Feed.Event>
       <Feed.Label>{chatIcon}</Feed.Label>
-      <Feed.Content  onClick={() => setOpenChat(chat.id, chatName)}>
+      <Feed.Content onClick={() => setOpenChat(chat.id, chatName)}>
         <Feed.Summary>
           <Feed.User>{chatName}</Feed.User>
         </Feed.Summary>
-        <Feed.Meta>{chat.unread} unread messages</Feed.Meta>
+        <Feed.Meta>{chat.unread.length} unread messages</Feed.Meta>
       </Feed.Content>
     </Feed.Event>
   );
