@@ -1,15 +1,17 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { Sidebar, Grid, Menu, Segment } from "semantic-ui-react";
+import { useApolloClient, useSubscription } from "@apollo/client";
+import React, { useContext, useState } from "react";
+
 import { DimensionContext } from "../../context/dimension";
+import { MessageContext } from "../../context/message";
+import { AuthContext } from "../../context/auth";
+import { FETCH_USER_INFO_QUERY, ON_INVITE } from "../../util/graphql";
+
+import { Sidebar, Grid, Menu, Segment } from "semantic-ui-react";
+import ChatContainer from "../Chat/ChatContainer";
 import Invites from "../Invites/Invites";
 import MenuBar from "./MenuBar";
 import MenuItems from "./MenuItems";
 import Messages from "../Message/Messages";
-import { MessageContext } from "../../context/message";
-import { AuthContext } from "../../context/auth";
-import { useApolloClient, useSubscription } from "@apollo/client";
-import { FETCH_USER_INFO_QUERY, ON_INVITE } from "../../util/graphql";
-import ChatContainer from "../Chat/ChatContainer";
 
 const Layout = (props) => {
   const { children } = props;
@@ -57,8 +59,8 @@ const Layout = (props) => {
                 },
               });
             }
-
             break;
+
           case "CONFIRMED":
             addMessage(
               `You are now friends with ${data.invite.firstname} ${data.invite.lastname}.`,
@@ -91,7 +93,6 @@ const Layout = (props) => {
                 },
               });
             }
-
             break;
 
           default:

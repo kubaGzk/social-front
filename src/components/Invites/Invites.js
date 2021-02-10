@@ -1,12 +1,14 @@
+import React, { useContext } from "react";
 import { useQuery } from "@apollo/client";
-import React, { useRef, useEffect, useContext } from "react";
-import { Grid, Header, List, Loader, Modal } from "semantic-ui-react";
+
 import { DimensionContext } from "../../context/dimension";
 import { FETCH_INVITES } from "../../util/graphql";
+
+import { Grid, Header, List, Loader, Modal } from "semantic-ui-react";
 import InviteItems from "./InviteItems";
 
 const Invites = (props) => {
-  const { showInvites, setShowInvites } = props;
+  const { setShowInvites } = props;
 
   const { width } = useContext(DimensionContext);
 
@@ -14,13 +16,13 @@ const Invites = (props) => {
     fetchPolicy: "cache-and-network",
   });
 
-  let invites = { sent: [], received: [] };
-
-  if (data && data.getInvitations) invites = data.getInvitations;
-
   const closeModal = () => {
     setShowInvites(false);
   };
+  
+  let invites = { sent: [], received: [] };
+
+  if (data && data.getInvitations) invites = data.getInvitations;
 
   return (
     <Modal onClose={closeModal} open={true} closeIcon centered={false}>

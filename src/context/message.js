@@ -1,5 +1,5 @@
-import shortid from "shortid";
 import React, { createContext, useState } from "react";
+import shortid from "shortid";
 
 const INITIAL_CONTEXT = {
   addMessage: () => {},

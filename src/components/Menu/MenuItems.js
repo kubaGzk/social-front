@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { Button, Label, Menu, Dropdown } from "semantic-ui-react";
+
 import { AuthContext } from "../../context/auth";
 import { DimensionContext } from "../../context/dimension";
+
+import { Button, Label, Menu, Dropdown } from "semantic-ui-react";
 import UserSearch from "../UserSearch/UserSearch";
 
 const MenuItems = (props) => {

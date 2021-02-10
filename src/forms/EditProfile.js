@@ -1,17 +1,19 @@
-import { useMutation } from "@apollo/client";
 import React, { useContext, useState } from "react";
+import { useMutation } from "@apollo/client";
+
+import { AuthContext } from "../context/auth";
+import { DimensionContext } from "../context/dimension";
+import { UPDATE_USER } from "../util/graphql";
+import { useForm } from "../util/hooks";
+
 import { Button, Form, Item } from "semantic-ui-react";
 import ImageEditor from "../components/Image/ImageEditor";
-import { AuthContext } from "../context/auth";
-import { CREATE_INVITE, UPDATE_USER } from "../util/graphql";
-import { useForm } from "../util/hooks";
 
 const EditProfile = (props) => {
   const {
     firstname,
     lastname,
     image,
-    id,
     description,
     setEditMode,
     refetchUser,
@@ -19,6 +21,10 @@ const EditProfile = (props) => {
   } = props;
 
   const { updateUserData } = useContext(AuthContext);
+  const { width } = useContext(DimensionContext);
+
+  const [errors, setErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   const [values, onChange, onSubmit] = useForm(updateHandler, {
     firstname,
@@ -27,8 +33,6 @@ const EditProfile = (props) => {
     description: description || "",
   });
 
-  const [errors, setErrors] = useState({});
-  const [showModal, setShowModal] = useState(false);
 
   const [updateUser, { loading }] = useMutation(UPDATE_USER, {
     update(
@@ -133,7 +137,7 @@ const EditProfile = (props) => {
           </div>
         )}
         <Item.Extra>
-          <Button.Group floated="right">
+          <Button.Group floated="right" size={width <= 768 ? "tiny" : "medium"}>
             <Button positive onClick={onSubmit}>
               Save changes
             </Button>

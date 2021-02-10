@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+
 import { Checkbox } from "semantic-ui-react";
 import Login from "../forms/Login";
 import Register from "../forms/Register";
+
 const LoginPage = (props) => {
   const [currentPage, setPage] = useState("login");
 

@@ -7,14 +7,6 @@ const ChatMessages = (props) => {
 
   const { userId } = useContext(AuthContext);
 
-  const userNames = {};
-  const userImages = {};
-
-  for (const usr of users) {
-    userNames[usr.id] = usr.firstname;
-    userImages[usr.id] = usr.image;
-  }
-
   const [scrollBottom, setScrollBottom] = useState(false);
 
   const onScrollEvent = (e) => {
@@ -47,6 +39,14 @@ const ChatMessages = (props) => {
       setScrollBottom(true);
     }
   }, [messages, writing]);
+
+  const userNames = {};
+  const userImages = {};
+
+  for (const usr of users) {
+    userNames[usr.id] = usr.firstname;
+    userImages[usr.id] = usr.image;
+  }
 
   return (
     <>

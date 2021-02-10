@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Icon, Button } from "semantic-ui-react";
+
 import { DimensionContext } from "../../context/dimension";
+
 import MenuItems from "./MenuItems";
+import { Menu, Icon, Button } from "semantic-ui-react";
 
 const MenuBar = (props) => {
   const { width } = useContext(DimensionContext);

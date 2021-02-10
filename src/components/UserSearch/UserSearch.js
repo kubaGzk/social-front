@@ -1,7 +1,9 @@
-import { useLazyQuery } from "@apollo/client";
 import React, { useRef, useState, useCallback } from "react";
-import { Ref, Search } from "semantic-ui-react";
+import { useLazyQuery } from "@apollo/client";
+
 import { FETCH_USER_LIST } from "../../util/graphql";
+
+import { Search } from "semantic-ui-react";
 
 const UserSearch = (props) => {
   const { placeholder, resultSelect } = props;

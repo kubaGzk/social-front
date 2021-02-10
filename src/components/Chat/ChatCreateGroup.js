@@ -1,17 +1,19 @@
-import { useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
-import { List, Modal, Grid, Image } from "semantic-ui-react";
+import { useMutation } from "@apollo/client";
+
 import { AuthContext } from "../../context/auth";
+import { CREATE_CHAT_GROUP } from "../../util/graphql";
+
+import { List, Modal, Grid, Image, Button } from "semantic-ui-react";
 import UserSearch from "../UserSearch/UserSearch";
 
 const ChatCreateGroup = (props) => {
-  const { closeModal } = props;
-
-  //   const [createGroup] = useMutation();
+  const { closeModal, setShowChat, setOpenChat } = props;
 
   const { userId, firstname, lastname, image } = useContext(AuthContext);
 
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState();
 
   useEffect(() => {
     const initalUser = {
@@ -23,19 +25,48 @@ const ChatCreateGroup = (props) => {
     setUsers([initalUser]);
   }, []);
 
-  const addUser = (e, data) => {
-    console.log(data.result);
-    setUsers((prev) => {
-      if (prev.findIndex((usr) => usr.id === data.result.id) < 0) {
-        return [...prev, data.result];
-      } else {
-        return prev;
+  const [createGroup, { loading }] = useMutation(CREATE_CHAT_GROUP, {
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        setError("Unexpected issue occured, please try again later.");
       }
-    });
+
+      if (graphQLErrors) {
+        setError(graphQLErrors[0].message);
+      }
+
+      setTimeout(() => {
+        setError();
+      }, 3000);
+    },
+    onCompleted: (data) => {
+      setShowChat(true);
+      setOpenChat(data.createChat);
+      closeModal();
+    },
+  });
+
+  const createGroupHandler = () => {
+    const usersArr = users
+      .filter((usr) => usr.id !== userId)
+      .map((usr) => usr.id);
+
+    createGroup({ variables: { users: usersArr } });
+  };
+
+  const addUser = (e, data) => {
+    if (!loading)
+      setUsers((prev) => {
+        if (prev.findIndex((usr) => usr.id === data.result.id) < 0) {
+          return [...prev, data.result];
+        } else {
+          return prev;
+        }
+      });
   };
 
   const removeUser = (id) => {
-    setUsers((prev) => prev.filter((usr) => usr.id !== id));
+    if (!loading) setUsers((prev) => prev.filter((usr) => usr.id !== id));
   };
 
   return (
@@ -68,6 +99,21 @@ const ChatCreateGroup = (props) => {
                   </List.Item>
                 ))}
               </List>
+              <Button.Group size="mini">
+                <Button
+                  positive
+                  onClick={createGroupHandler}
+                  disabled={users.length <= 1}
+                  loading={loading}
+                >
+                  Create
+                </Button>
+                <Button.Or />
+                <Button negative onClick={closeModal} disabled={loading}>
+                  Cancel
+                </Button>
+              </Button.Group>
+              {error && <div className="ui error message">{error}</div>}
             </Grid.Column>
           </Grid.Row>
         </Grid>

@@ -1,12 +1,13 @@
-import React, { createContext, useState } from "react";
-import App from "./App";
+import React from "react";
 
 import { ApolloProvider } from "@apollo/react-hooks";
-import { AuthContextProvider } from "./context/auth";
 
+import { AuthContextProvider } from "./context/auth";
 import { DimensionContextProvider } from "./context/dimension";
 import { MessageContextProvider } from "./context/message";
 import createApolloClient from "./util/apollo-client";
+
+import App from "./App";
 
 const AppProvider = () => {
   const { client, wsLink } = createApolloClient();

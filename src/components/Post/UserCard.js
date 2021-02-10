@@ -11,6 +11,7 @@ import {
   Loader,
 } from "semantic-ui-react";
 import { AuthContext } from "../../context/auth";
+import { DimensionContext } from "../../context/dimension";
 import { MessageContext } from "../../context/message";
 import EditProfile from "../../forms/EditProfile";
 import {
@@ -41,6 +42,7 @@ const UserCard = (props) => {
 
   const { userId, token } = useContext(AuthContext);
   const { addMessage } = useContext(MessageContext);
+  const { width } = useContext(DimensionContext);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -160,7 +162,12 @@ const UserCard = (props) => {
                     </Item.Extra>
                     {token && (
                       <Item.Extra>
-                        <Button.Group floated="right">{buttons}</Button.Group>
+                        <Button.Group
+                          floated="right"
+                          size={width <= 768 ? "tiny" : "medium"}
+                        >
+                          {buttons}
+                        </Button.Group>
                       </Item.Extra>
                     )}
                   </Item.Content>

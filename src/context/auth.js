@@ -1,14 +1,9 @@
-import { useMutation } from "@apollo/react-hooks";
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useReducer,
-} from "react";
-import jwtDecode from "jwt-decode";
-import { VALIDATE_TOKEN } from "../util/graphql";
+import React, { createContext, useCallback, useReducer } from "react";
 import { useApolloClient } from "@apollo/client";
-import { WebSocketLink } from "@apollo/client/link/ws";
+import { useMutation } from "@apollo/react-hooks";
+import jwtDecode from "jwt-decode";
+
+import { VALIDATE_TOKEN } from "../util/graphql";
 
 const INITIAL_STATE = {
   token: null,

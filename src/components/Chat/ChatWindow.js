@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState, useRef } from "react";
-import { Comment, Input, Form, Card, Button, Icon } from "semantic-ui-react";
+import { useMutation, useQuery } from "@apollo/client";
+
 import { AuthContext } from "../../context/auth";
 import {
   END_WRITING,
@@ -10,6 +10,8 @@ import {
   START_WRITING,
   WRITE_MESSAGE,
 } from "../../util/graphql";
+
+import { Comment, Input, Form, Card, Button, Icon } from "semantic-ui-react";
 import ChatMessages from "./ChatMessages";
 
 const ChatWindow = (props) => {
@@ -18,6 +20,8 @@ const ChatWindow = (props) => {
   const { userId } = useContext(AuthContext);
 
   const [textMessage, setTextMessage] = useState("");
+
+  const timeoutRef = useRef();
 
   const { data, subscribeToMore } = useQuery(FETCH_CHAT, {
     variables: { chatId },
@@ -60,35 +64,6 @@ const ChatWindow = (props) => {
     };
   }, [chatId]);
 
-  let chat;
-
-  if (data && data.getChat) {
-    chat = data.getChat;
-  }
-
-  const timeoutRef = useRef();
-
-  const writingHandler = (e) => {
-    setTextMessage(e.target.value);
-
-    if (chat.writing.indexOf(userId) < 0) {
-      startWriting();
-    }
-
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      console.log("timeout");
-      endWriting({ variables: { chatId: chatId } });
-    }, 2000);
-  };
-
-  const sendHandler = () => {
-    if (textMessage.length > 0) {
-      sendMessage();
-      setTextMessage("");
-    }
-  };
-
   useEffect(() => {
     const unread = [];
 
@@ -100,6 +75,32 @@ const ChatWindow = (props) => {
       readMessage({ variables: { messageIds: chat.unread } });
     }
   }, [chat]);
+
+  const writingHandler = (e) => {
+    setTextMessage(e.target.value);
+
+    if (chat.writing.indexOf(userId) < 0) {
+      startWriting();
+    }
+
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      endWriting({ variables: { chatId: chatId } });
+    }, 2000);
+  };
+
+  const sendHandler = () => {
+    if (textMessage.length > 0) {
+      sendMessage();
+      setTextMessage("");
+    }
+  };
+
+  let chat;
+
+  if (data && data.getChat) {
+    chat = data.getChat;
+  }
 
   return (
     <Card>
@@ -115,7 +116,7 @@ const ChatWindow = (props) => {
           <Button
             size="tiny"
             id="close-chat"
-            onClick={() => setOpenChat(null, "")}
+            onClick={() => setOpenChat(null)}
             style={{ paddingLeft: "0.6em", paddingRight: "0.6em" }}
           >
             <Icon style={{ margin: "0" }} name="close" id="close-chat-icon" />

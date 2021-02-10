@@ -70,6 +70,12 @@
   align-items: center;
 }
 
+.post-card-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .login-container {
   background-color: #fff;
   border-radius: 0.28571429rem;
@@ -112,6 +118,10 @@
   display: flex;
   flex-direction: row-reverse;
   height: 60vh;
+}
+
+.chat-menu.zero-height {
+  height: 0 !important;
 }
 
 .display-none {

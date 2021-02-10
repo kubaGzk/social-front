@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
-import { TransitionGroup } from "semantic-ui-react";
+
 import { MessageContext } from "../../context/message";
+
+import { TransitionGroup } from "semantic-ui-react";
 import MessageBox from "./MessageBox";
 
 const Messages = () => {

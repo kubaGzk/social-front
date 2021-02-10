@@ -1,11 +1,12 @@
-import { useMutation } from "@apollo/react-hooks";
 import React, { useContext, useState } from "react";
+import { useMutation } from "@apollo/react-hooks";
 
-import { Button, Form } from "semantic-ui-react";
-import ImageEditor from "../components/Image/ImageEditor";
 import { AuthContext } from "../context/auth";
 import { REGISTER_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Button, Form } from "semantic-ui-react";
+import ImageEditor from "../components/Image/ImageEditor";
 
 const INITIAL_STATE = {
   username: "",

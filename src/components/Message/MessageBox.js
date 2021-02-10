@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
-import { Message } from "semantic-ui-react";
+
 import { DimensionContext } from "../../context/dimension";
+
+import { Message } from "semantic-ui-react";
 
 const MessageBox = (props) => {
   const { header, text, type, cb, dismiss } = props;

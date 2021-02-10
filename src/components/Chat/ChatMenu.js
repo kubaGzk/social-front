@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+
 import { Button, Card, Feed } from "semantic-ui-react";
 import ChatCreateGroup from "./ChatCreateGroup";
 import ChatMenuItem from "./ChatMenuItem";
@@ -7,7 +8,8 @@ import ChatWindow from "./ChatWindow";
 const ChatMenu = forwardRef((props, ref) => {
   const {
     chats,
-    show,
+    showChat,
+    setShowChat,
     openChat,
     setOpenChat,
     openChatName,
@@ -16,12 +18,17 @@ const ChatMenu = forwardRef((props, ref) => {
   } = props;
 
   const cardClasses = [];
-  if (!show) {
+  if (!showChat) {
     cardClasses.push("display-none");
   }
 
+  const menuClasses = ["chat-menu"];
+
+  if (!showChat && !openChat) {
+    menuClasses.push("zero-height");
+  }
   return (
-    <div className="chat-menu" ref={ref}>
+    <div className={menuClasses.join(" ")} ref={ref}>
       <Card className={cardClasses.join(" ")}>
         <Card.Content style={{ height: "45px", padding: "0.5em" }}>
           <div
@@ -35,7 +42,10 @@ const ChatMenu = forwardRef((props, ref) => {
             <Button
               positive
               size="tiny"
-              onClick={() => setOpenCreateGroup(true)}
+              onClick={() => {
+                setOpenCreateGroup(true);
+                setShowChat(false);
+              }}
             >
               Create chat
             </Button>
@@ -70,6 +80,8 @@ const ChatMenu = forwardRef((props, ref) => {
         <ChatCreateGroup
           openCreateGroup={openCreateGroup}
           closeModal={() => setOpenCreateGroup(false)}
+          setShowChat={setShowChat}
+          setOpenChat={setOpenChat}
         />
       )}
     </div>

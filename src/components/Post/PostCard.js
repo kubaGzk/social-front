@@ -1,4 +1,19 @@
 import React, { useContext, useState } from "react";
+import moment from "moment";
+import { useMutation } from "@apollo/react-hooks";
+import { Link } from "react-router-dom";
+
+import {
+  COMMENT_POST_MUTATION,
+  DELETE_COMMENT_MUTATION,
+  DELETE_POST_MUTATION,
+  EDIT_POST,
+  LIKE_POST_MUTATION,
+} from "../../util/graphql";
+import { useForm } from "../../util/hooks";
+import { DimensionContext } from "../../context/dimension";
+import { AuthContext } from "../../context/auth";
+
 import {
   Loader,
   Card,
@@ -10,22 +25,10 @@ import {
   Dimmer,
   Segment,
   Form,
+  Dropdown,
 } from "semantic-ui-react";
-import moment from "moment";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/auth";
-import Comments from "./Comments";
-import { useMutation } from "@apollo/react-hooks";
-import {
-  COMMENT_POST_MUTATION,
-  DELETE_COMMENT_MUTATION,
-  DELETE_POST_MUTATION,
-  EDIT_POST,
-  LIKE_POST_MUTATION,
-} from "../../util/graphql";
 import Likes from "./Likes";
-import { useForm } from "../../util/hooks";
-import { DimensionContext } from "../../context/dimension";
+import Comments from "./Comments";
 
 const PostCard = (props) => {
   const {
@@ -135,8 +138,128 @@ const PostCard = (props) => {
   if (likes.findIndex((like) => like.userId === localUser) !== -1)
     invertedLike = true;
 
+  let postCard = (
+    <Card fluid>
+      <Card.Content>
+        <Image
+          floated="left"
+          size="mini"
+          src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
+          style={{ borderRadius: "0.25rem" }}
+        />
+        <Card.Header
+          as={Link}
+          to={`/user/${userId}`}
+        >{`${firstname} ${lastname}`}</Card.Header>
+        <Card.Meta>{moment(createdAt).fromNow(true)}</Card.Meta>
+        <Card.Description>
+          <p>{body}</p>
+          {type === "IMAGE" && (
+            <div className="post-image">
+              <Image src={process.env.REACT_APP_IMAGES_URL + "/" + image} />
+            </div>
+          )}
+        </Card.Description>
+      </Card.Content>
+      <Segment style={{ borderRadius: "0", borderWidth: "1px 0 0 0" }}>
+        <Card.Content extra className="post-card-buttons">
+          <Button.Group>
+            <Popup
+              hoverable
+              trigger={
+                <Button
+                  as="div"
+                  labelPosition="right"
+                  onClick={() => localUser && addLike()}
+                  style={{ marginBottom: "0.2rem", marginRight: "0.2rem" }}
+                >
+                  <Button color="teal" basic={!invertedLike}>
+                    <Icon name="heart" />
+                  </Button>
+
+                  <Label basic color="teal" pointing="left">
+                    {likeCount}
+                  </Label>
+                </Button>
+              }
+            >
+              <Popup.Header>Likes</Popup.Header>
+              <Popup.Content>
+                <Likes likes={likes} />
+              </Popup.Content>
+            </Popup>
+
+            <Button
+              as="div"
+              labelPosition="right"
+              onClick={toggleComments}
+              style={{ marginBottom: "0.2rem" }}
+            >
+              <Button color="blue" basic>
+                <Icon name="comments" />
+              </Button>
+              <Label basic color="blue" pointing="left">
+                {commentCount}
+              </Label>
+            </Button>
+          </Button.Group>
+          {userId === localUser &&
+            !editMode &&
+            (width <= 768 ? (
+              <Dropdown icon="ellipsis vertical">
+                <Dropdown.Menu direction="left">
+                  <Dropdown.Item
+                    text="Delete"
+                    icon="delete"
+                    onClick={delPost}
+                  />
+                  <Dropdown.Item
+                    text="Edit"
+                    icon="edit outline"
+                    onClick={() => setEditMode(true)}
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+            ) : (
+              <Button.Group className={"right floated"}>
+                <Button
+                  color="red"
+                  content="Delete"
+                  icon="delete"
+                  onClick={delPost}
+                />
+                <Button
+                  color="blue"
+                  content="Edit"
+                  icon="edit outline"
+                  onClick={() => setEditMode(true)}
+                />
+              </Button.Group>
+            ))}
+          {commentsMenu && (
+            <Comments
+              localUserId={localUser}
+              commentBody={commentBody}
+              comments={comments}
+              editComment={commentBodyHandler}
+              submitComment={addComent}
+              deleteComment={deleteCommentHandler}
+            />
+          )}
+
+          <Dimmer
+            active={dpLoading || ccLoading || dcLoading || alLoading}
+            inverted
+          >
+            <Loader />
+          </Dimmer>
+        </Card.Content>
+      </Segment>
+    </Card>
+  );
+
   if (userId === localUser && editMode) {
-    return (
+    postCard = (
       <Card fluid>
         <Card.Content>
           <Image
@@ -207,106 +330,7 @@ const PostCard = (props) => {
     );
   }
 
-  return (
-    <Card fluid>
-      <Card.Content>
-        <Image
-          floated="left"
-          size="mini"
-          src={process.env.REACT_APP_IMAGES_URL + "/" + userImage}
-          style={{ borderRadius: "0.25rem" }}
-        />
-        <Card.Header
-          as={Link}
-          to={`/user/${userId}`}
-        >{`${firstname} ${lastname}`}</Card.Header>
-        <Card.Meta>{moment(createdAt).fromNow(true)}</Card.Meta>
-        <Card.Description>
-          <p>{body}</p>
-          {type === "IMAGE" && (
-            <div className="post-image">
-              <Image src={process.env.REACT_APP_IMAGES_URL + "/" + image} />
-            </div>
-          )}
-        </Card.Description>
-      </Card.Content>
-      <Segment style={{ borderRadius: "0", borderWidth: "1px 0 0 0" }}>
-        <Card.Content extra>
-          <Popup
-            hoverable
-            trigger={
-              <Button
-                as="div"
-                labelPosition="right"
-                onClick={() => localUser && addLike()}
-                style={{ marginBottom: "0.2rem" }}
-              >
-                <Button color="teal" basic={!invertedLike}>
-                  <Icon name="heart" />
-                </Button>
-
-                <Label basic color="teal" pointing="left">
-                  {likeCount}
-                </Label>
-              </Button>
-            }
-          >
-            <Popup.Header>Likes</Popup.Header>
-            <Popup.Content>
-              <Likes likes={likes} />
-            </Popup.Content>
-          </Popup>
-
-          <Button
-            as="div"
-            labelPosition="right"
-            onClick={toggleComments}
-            style={{ marginBottom: "0.2rem" }}
-          >
-            <Button color="blue" basic>
-              <Icon name="comments" />
-            </Button>
-            <Label basic color="blue" pointing="left">
-              {commentCount}
-            </Label>
-          </Button>
-          {userId === localUser && !editMode && (
-            <Button.Group className={width > 600 ? "right floated" : ""}>
-              <Button
-                color="red"
-                content="Delete"
-                icon="delete"
-                onClick={delPost}
-              />
-              <Button
-                color="blue"
-                content="Edit"
-                icon="edit outline"
-                onClick={() => setEditMode(true)}
-              />
-            </Button.Group>
-          )}
-          {commentsMenu && (
-            <Comments
-              localUserId={localUser}
-              commentBody={commentBody}
-              comments={comments}
-              editComment={commentBodyHandler}
-              submitComment={addComent}
-              deleteComment={deleteCommentHandler}
-            />
-          )}
-
-          <Dimmer
-            active={dpLoading || ccLoading || dcLoading || alLoading}
-            inverted
-          >
-            <Loader />
-          </Dimmer>
-        </Card.Content>
-      </Segment>
-    </Card>
-  );
+  return postCard;
 };
 
 export default PostCard;

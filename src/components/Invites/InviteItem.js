@@ -1,9 +1,11 @@
-import { useMutation } from "@apollo/client";
 import React, { useContext } from "react";
+import { useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { Button, Image, List } from "semantic-ui-react";
+
 import { AuthContext } from "../../context/auth";
 import { CONFIRM_INVITE, DECLINE_INVITE } from "../../util/graphql";
+
+import { Button, Image, List } from "semantic-ui-react";
 
 const InviteItem = (props) => {
   const { received, invite, refetchInvites, closeModal } = props;
@@ -15,7 +17,7 @@ const InviteItem = (props) => {
       console.log(err);
     },
     variables: { requestor: invite.id },
-    update(cache, { data: { confirmInvite } }) {
+    update(cache) {
       const cachedId = cache.identify({
         __typename: "UserInfo",
         id: invite.id,
@@ -42,7 +44,7 @@ const InviteItem = (props) => {
       console.log(err);
     },
     variables: { requestor: invite.id },
-    update(cache, { data: { declineInvite } }) {
+    update(cache) {
       const cachedId = cache.identify({
         __typename: "UserInfo",
         id: invite.id,
@@ -61,32 +63,7 @@ const InviteItem = (props) => {
     },
   });
 
-  if (!received) {
-    return (
-      <List.Item key={invite.id}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            size="mini"
-            src={process.env.REACT_APP_IMAGES_URL + "/" + invite.image}
-          />
-          <span style={{ marginLeft: "0.5rem" }}>
-            <List.Header
-              as={Link}
-              to={`/user/${invite.id}`}
-              onClick={closeModal}
-            >{`${invite.firstname} ${invite.lastname}`}</List.Header>
-          </span>
-        </div>
-      </List.Item>
-    );
-  }
-
-  return (
+  let inviteItem = (
     <List.Item key={invite.id}>
       <div
         style={{
@@ -126,6 +103,33 @@ const InviteItem = (props) => {
       </div>
     </List.Item>
   );
+
+  if (!received) {
+    inviteItem = (
+      <List.Item key={invite.id}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            size="mini"
+            src={process.env.REACT_APP_IMAGES_URL + "/" + invite.image}
+          />
+          <span style={{ marginLeft: "0.5rem" }}>
+            <List.Header
+              as={Link}
+              to={`/user/${invite.id}`}
+              onClick={closeModal}
+            >{`${invite.firstname} ${invite.lastname}`}</List.Header>
+          </span>
+        </div>
+      </List.Item>
+    );
+  }
+
+  return inviteItem;
 };
 
 export default InviteItem;

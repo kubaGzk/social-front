@@ -1,9 +1,11 @@
+import React, { useState, useContext } from "react";
 import { useMutation } from "@apollo/react-hooks";
-import React, { useState, useContext, useAuth } from "react";
-import { Button, Form } from "semantic-ui-react";
+
 import { AuthContext } from "../context/auth";
 import { LOGIN_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Button, Form } from "semantic-ui-react";
 
 const INITIAL_STATE = {
   username: "",
@@ -11,7 +13,9 @@ const INITIAL_STATE = {
 };
 
 const Login = (props) => {
+  
   const { login } = useContext(AuthContext);
+
   const [errors, setErrors] = useState({});
 
   const [values, onChange, onSubmit] = useForm(loginHandler, INITIAL_STATE);

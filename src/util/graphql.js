@@ -384,6 +384,21 @@ export const READ_MESSAGE = gql`
   }
 `;
 
+export const CREATE_CHAT_GROUP = gql`
+  mutation createChat($users: [ID!]) {
+    createChat(users: $users) {
+      id
+      users {
+        firstname
+        lastname
+        image
+        id
+      }
+      unread
+    }
+  }
+`;
+
 export const ON_NEW_POST = gql`
   subscription newPost {
     newPost {

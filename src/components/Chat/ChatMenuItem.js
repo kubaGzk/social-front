@@ -1,11 +1,22 @@
 import React, { useContext } from "react";
-import { Feed, Icon } from "semantic-ui-react";
+
 import { AuthContext } from "../../context/auth";
+
+import { Feed, Icon } from "semantic-ui-react";
 
 const ChatMenuItem = (props) => {
   const { setOpenChat, chat } = props;
 
   const { userId } = useContext(AuthContext);
+
+  const chatName = chat.users
+    .filter((user) => user.id !== userId)
+    .map((user, ind) => {
+      if (ind > 0) {
+        return `, ${user.firstname} ${user.lastname}`;
+      }
+      return `${user.firstname} ${user.lastname}`;
+    });
 
   let chatIcon = <Icon name="group" />;
 
@@ -18,19 +29,10 @@ const ChatMenuItem = (props) => {
     );
   }
 
-  const chatName = chat.users
-    .filter((user) => user.id !== userId)
-    .map((user, ind) => {
-      if (ind > 0) {
-        return `, ${user.firstname} ${user.lastname}`;
-      }
-      return `${user.firstname} ${user.lastname}`;
-    });
-
   return (
     <Feed.Event>
       <Feed.Label>{chatIcon}</Feed.Label>
-      <Feed.Content onClick={() => setOpenChat(chat.id, chatName)}>
+      <Feed.Content onClick={() => setOpenChat(chat)}>
         <Feed.Summary>
           <Feed.User>{chatName}</Feed.User>
         </Feed.Summary>

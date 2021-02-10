@@ -1,18 +1,21 @@
-import { useMutation } from "@apollo/react-hooks";
 import React, { useState } from "react";
-import { Card, Form, Grid, TextArea, Input } from "semantic-ui-react";
+import { useMutation } from "@apollo/react-hooks";
+
 import { CREATE_POST, FETCH_POSTS_QUERY } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Card, Form, Grid, TextArea, Input } from "semantic-ui-react";
 
 const INITIAL_STATE = { body: "", image: null };
 
 const NewPost = (props) => {
+  
+  const [error, setError] = useState();
+
   const [values, onChange, onSubmit, onClear] = useForm(
     submitPostHandler,
     INITIAL_STATE
   );
-
-  const [error, setError] = useState();
 
   const [submitPost, { loading }] = useMutation(CREATE_POST, {
     update(cache, { data: { createPost: postData } }) {

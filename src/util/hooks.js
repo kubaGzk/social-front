@@ -1,5 +1,6 @@
 import { useApolloClient, useQuery } from "@apollo/client";
-import { useContext, useState, useEffect, useCallback } from "react";
+import { useContext, useState, useEffect } from "react";
+
 import { AuthContext } from "../context/auth";
 import { DimensionContext } from "../context/dimension";
 import { MessageContext } from "../context/message";

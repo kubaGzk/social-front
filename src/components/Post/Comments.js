@@ -1,4 +1,7 @@
 import React from "react";
+import moment from "moment";
+import { Link } from "react-router-dom";
+
 import {
   Comment,
   Header,
@@ -7,8 +10,6 @@ import {
   Message,
   Icon,
 } from "semantic-ui-react";
-import moment from "moment";
-import { Link } from "react-router-dom";
 
 const Comments = (props) => {
   let comments = "No comments";

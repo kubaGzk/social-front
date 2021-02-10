@@ -1,9 +1,11 @@
-import { useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
-import PostCard from "../components/Post/PostCard";
+import { useQuery } from "@apollo/client";
+
 import { useGetPosts } from "../util/hooks";
 import { FETCH_USER_INFO_QUERY } from "../util/graphql";
+
+import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
+import PostCard from "../components/Post/PostCard";
 import UserCard from "../components/Post/UserCard";
 
 const User = (props) => {
