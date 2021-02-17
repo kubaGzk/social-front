@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 
 import { CREATE_POST, FETCH_POSTS_QUERY } from "../util/graphql";
 import { useForm } from "../util/hooks";

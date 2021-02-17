@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import moment from "moment";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
 
 import {
