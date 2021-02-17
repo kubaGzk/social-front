@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useReducer } from "react";
 import { useApolloClient } from "@apollo/client";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import jwtDecode from "jwt-decode";
 
 import { VALIDATE_TOKEN } from "../util/graphql";

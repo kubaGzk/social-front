@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 
 import { AuthContext } from "../context/auth";
 import { REGISTER_USER } from "../util/graphql";
