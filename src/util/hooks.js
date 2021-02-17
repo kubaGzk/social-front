@@ -4,6 +4,7 @@ import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/auth";
 import { DimensionContext } from "../context/dimension";
 import { MessageContext } from "../context/message";
+
 import {
   FETCH_POSTS_QUERY,
   ON_DEL_POST,
@@ -53,6 +54,19 @@ export const useGetPosts = (userId) => {
       onCompleted: (data) => {
         if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
           setDataComplete(true);
+      },
+      onError: ({ networkError, graphQLErrors }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
+        if (networkError) {
+          console.log(networkError);
+        }
+
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+
+        addMessage(error, "Error", "negative");
       },
       variables: { userId: userId },
     }
@@ -144,4 +158,24 @@ export const useGetPosts = (userId) => {
     dataComplete,
     refetch,
   };
+};
+
+export const useErrorHandler = () => {
+  const { addMessage } = useContext(MessageContext);
+
+  const errorHandler = ({ networkError, graphQLErrors }) => {
+    let error =
+      "Unexpected issue occured, please try again later or contact Admin.";
+    if (networkError) {
+      console.log(networkError);
+    }
+
+    if (graphQLErrors && graphQLErrors[0]) {
+      error = graphQLErrors[0].message;
+    }
+
+    addMessage(error, "Error", "negative");
+  };
+
+  return { errorHandler };
 };

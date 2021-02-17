@@ -10,7 +10,7 @@ import {
   EDIT_POST,
   LIKE_POST_MUTATION,
 } from "../../util/graphql";
-import { useForm } from "../../util/hooks";
+import { useErrorHandler, useForm } from "../../util/hooks";
 import { DimensionContext } from "../../context/dimension";
 import { AuthContext } from "../../context/auth";
 
@@ -63,24 +63,31 @@ const PostCard = (props) => {
     image: "",
   });
 
+  const { errorHandler } = useErrorHandler();
+
   const [delPost, { loading: dpLoading }] = useMutation(DELETE_POST_MUTATION, {
-    onError(err) {
-      console.log(err);
-      showError("Error");
-    },
     variables: { postId: id },
+    onError: errorHandler,
   });
 
   const [addComent, { loading: ccLoading }] = useMutation(
     COMMENT_POST_MUTATION,
     {
-      update() {
-        console.log("COMMMENITNG");
+      update: () => {
         setCommentBody("");
       },
       variables: { postId: id, body: commentBody },
-      onError(err) {
-        showError(err.graphQLErrors[0].message);
+      onError: ({ networkError, graphQLErrors }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
+        if (networkError) {
+          console.log(networkError);
+        }
+
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+        showError(error);
       },
     }
   );
@@ -88,17 +95,34 @@ const PostCard = (props) => {
   const [delComment, { loading: dcLoading }] = useMutation(
     DELETE_COMMENT_MUTATION,
     {
-      onError(err) {
-        console.log(err.graphQLErrors);
-        showError(err.graphQLErrors[0].message);
+      onError: ({ networkError, graphQLErrors }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
+        if (networkError) {
+          console.log(networkError);
+        }
+
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+        showError(error);
       },
     }
   );
 
   const [addLike, { loading: alLoading }] = useMutation(LIKE_POST_MUTATION, {
     variables: { postId: id },
-    onError(err) {
-      showError(err.graphQLErrors[0].message);
+    onError: ({ networkError, graphQLErrors }) => {
+      let error =
+        "Unexpected issue occured, please try again later or contact Admin.";
+      if (networkError) {
+        console.log(networkError);
+      }
+
+      if (graphQLErrors && graphQLErrors[0]) {
+        error = graphQLErrors[0].message;
+      }
+      showError(error);
     },
   });
 
@@ -106,13 +130,27 @@ const PostCard = (props) => {
     update: () => {
       setEditMode(false);
     },
-    onError({ graphQLErrors, networkError }) {
-      console.log(graphQLErrors, networkError);
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        console.log(networkError);
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
 
-      graphQLErrors[0] &&
+      if (
+        graphQLErrors &&
+        graphQLErrors[0] &&
+        graphQLErrors[0]?.extensions?.exception?.errors
+      ) {
         setErrors(graphQLErrors[0].extensions.exception.errors);
-
-      networkError && setErrors({ general: "Unexpected network error" });
+      } else {
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
     },
     variables: { postId: id, ...values },
   });

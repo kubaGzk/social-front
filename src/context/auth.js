@@ -59,7 +59,7 @@ const authReducer = (state, action) => {
 
 const AuthContextProvider = (props) => {
   const [
-    { token, firstname, lastname, image, userId, email, error },
+    { token, firstname, lastname, image, userId, email },
     dispatch,
   ] = useReducer(authReducer, INITIAL_STATE);
 
@@ -139,7 +139,7 @@ const AuthContextProvider = (props) => {
       );
     },
     onError(err) {
-      console.log(err.graphQLErrors);
+      console.log(err);
       logout();
     },
   });

@@ -13,7 +13,6 @@ const INITIAL_STATE = {
 };
 
 const Login = (props) => {
-  
   const { login } = useContext(AuthContext);
 
   const [errors, setErrors] = useState({});
@@ -21,7 +20,7 @@ const Login = (props) => {
   const [values, onChange, onSubmit] = useForm(loginHandler, INITIAL_STATE);
 
   const [userLogin, { loading }] = useMutation(LOGIN_USER, {
-    update(_, result) {
+    update: (_, result) => {
       const {
         data: {
           login: { id, email, token, firstname, lastname, image },
@@ -32,9 +31,27 @@ const Login = (props) => {
       props.history.push("/");
     },
 
-    onError(err) {
-      console.log(err.graphQLErrors[0].extensions.exception.errors);
-      setErrors(err.graphQLErrors[0].extensions.exception.errors);
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        console.log(networkError);
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
+
+      if (
+        graphQLErrors &&
+        graphQLErrors[0] &&
+        graphQLErrors[0]?.extensions?.exception?.errors
+      ) {
+        setErrors(graphQLErrors[0].extensions.exception.errors);
+      } else {
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
     },
     variables: values,
   });
@@ -83,7 +100,5 @@ const Login = (props) => {
     </div>
   );
 };
-
-
 
 export default Login;

@@ -33,7 +33,6 @@ const EditProfile = (props) => {
     description: description || "",
   });
 
-
   const [updateUser, { loading }] = useMutation(UPDATE_USER, {
     update(
       _,
@@ -48,13 +47,23 @@ const EditProfile = (props) => {
       updateUserData(firstname, lastname, image);
       setEditMode(false);
     },
-    onError({ graphQLErrors, networkError }) {
-      console.log(graphQLErrors, networkError);
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        console.log(networkError);
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
 
-      graphQLErrors[0] &&
+      if (graphQLErrors && graphQLErrors[0]?.extensions?.exception?.errors) {
         setErrors(graphQLErrors[0].extensions.exception.errors);
-
-      networkError && setErrors({ general: "Unexpected network error" });
+      } else {
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
     },
     variables: values,
   });

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ApolloProvider } from "@apollo/react-hooks";
+import { ApolloProvider } from "@apollo/client";
 
 import { AuthContextProvider } from "./context/auth";
 import { DimensionContextProvider } from "./context/dimension";

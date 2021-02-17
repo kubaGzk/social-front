@@ -41,7 +41,7 @@ const DimensionContextProvider = (props) => {
     const innerHeigth = window.innerHeight;
 
     dispatch({ type: "SIZE", width: innerWidth, height: innerHeigth });
-  }, [window.innerWidth, window.innerHeigh]);
+  }, []);
 
   const updateScrollPosition = useCallback(() => {
     const scrollX = window.scrollX;
@@ -50,12 +50,7 @@ const DimensionContextProvider = (props) => {
     const scrollHeight = document.body.offsetHeight;
 
     dispatch({ type: "SCROLL", scrollX, scrollY, scrollWidth, scrollHeight });
-  }, [
-    window.scrollX,
-    window.scrollY,
-    document.body.offsetWidth,
-    document.body.offsetHeight,
-  ]);
+  }, []);
 
   useEffect(() => {
     window.addEventListener("resize", updateWindowSize);

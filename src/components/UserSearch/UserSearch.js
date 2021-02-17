@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback } from "react";
 import { useLazyQuery } from "@apollo/client";
 
 import { FETCH_USER_LIST } from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
 
 import { Search } from "semantic-ui-react";
 
@@ -16,10 +17,11 @@ const UserSearch = (props) => {
 
   searchValRef.current = searchVal;
 
+  const { errorHandler } = useErrorHandler();
+
   const [fetchUserList, { loading }] = useLazyQuery(FETCH_USER_LIST, {
     fetchPolicy: "no-cache",
     onCompleted: (data) => {
-      console.log(data);
       setResults(() => {
         if (data.getUserList.length < 1) {
           return [{ title: "No results" }];
@@ -34,6 +36,7 @@ const UserSearch = (props) => {
         });
       });
     },
+    onError: errorHandler,
   });
 
   const handleSearchChange = useCallback((e, data) => {

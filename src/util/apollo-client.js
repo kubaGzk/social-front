@@ -15,7 +15,6 @@ const createApolloClient = () => {
       reconnect: true,
       connectionParams: () => {
         const token = localStorage.getItem("token");
-        console.log("CONNECTION_PARAMS: ", token);
         return { authToken: token ? `Bearer ${token}` : "" };
       },
     },

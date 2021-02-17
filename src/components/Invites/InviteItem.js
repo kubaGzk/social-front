@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { AuthContext } from "../../context/auth";
 import { CONFIRM_INVITE, DECLINE_INVITE } from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
 
 import { Button, Image, List } from "semantic-ui-react";
 
@@ -12,12 +13,11 @@ const InviteItem = (props) => {
 
   const { userId } = useContext(AuthContext);
 
+  const { errorHandler } = useErrorHandler();
+
   const [confirmInvite] = useMutation(CONFIRM_INVITE, {
-    onError(err) {
-      console.log(err);
-    },
     variables: { requestor: invite.id },
-    update(cache) {
+    update: (cache) => {
       const cachedId = cache.identify({
         __typename: "UserInfo",
         id: invite.id,
@@ -37,14 +37,12 @@ const InviteItem = (props) => {
 
       refetchInvites();
     },
+    onError: errorHandler,
   });
 
   const [declineInvite] = useMutation(DECLINE_INVITE, {
-    onError(err) {
-      console.log(err);
-    },
     variables: { requestor: invite.id },
-    update(cache) {
+    update: (cache) => {
       const cachedId = cache.identify({
         __typename: "UserInfo",
         id: invite.id,
@@ -61,6 +59,7 @@ const InviteItem = (props) => {
 
       refetchInvites();
     },
+    onError: errorHandler,
   });
 
   let inviteItem = (

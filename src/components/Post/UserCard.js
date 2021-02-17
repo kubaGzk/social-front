@@ -1,5 +1,16 @@
-import { useMutation } from "@apollo/client";
 import React, { useContext, useState } from "react";
+import { useMutation } from "@apollo/client";
+
+import { AuthContext } from "../../context/auth";
+import { DimensionContext } from "../../context/dimension";
+import { MessageContext } from "../../context/message";
+import {
+  CONFIRM_INVITE,
+  CREATE_INVITE,
+  DECLINE_INVITE,
+} from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
+
 import {
   Card,
   Icon,
@@ -10,15 +21,7 @@ import {
   Dimmer,
   Loader,
 } from "semantic-ui-react";
-import { AuthContext } from "../../context/auth";
-import { DimensionContext } from "../../context/dimension";
-import { MessageContext } from "../../context/message";
 import EditProfile from "../../forms/EditProfile";
-import {
-  CONFIRM_INVITE,
-  CREATE_INVITE,
-  DECLINE_INVITE,
-} from "../../util/graphql";
 
 const UserCard = (props) => {
   const {
@@ -36,7 +39,6 @@ const UserCard = (props) => {
     },
     loading,
     refetchUser,
-    showMessage,
     refetchPosts,
   } = props;
 
@@ -46,37 +48,33 @@ const UserCard = (props) => {
 
   const [editMode, setEditMode] = useState(false);
 
+  const { errorHandler } = useErrorHandler();
+
   const [sendInvite, { loading: siLoading }] = useMutation(CREATE_INVITE, {
-    onError(err) {
-      console.log(err);
-    },
     variables: { receiver: id },
-    update(c, { data: { createInvite } }) {
+    update: (c, { data: { createInvite } }) => {
       addMessage(createInvite, "Invite", "info");
       refetchUser();
     },
+    onError: errorHandler,
   });
 
   const [confirmInvite, { loading: ciLoading }] = useMutation(CONFIRM_INVITE, {
-    onError(err) {
-      console.log(err);
-    },
     variables: { requestor: id },
-    update(c, { data: { confirmInvite } }) {
+    update: (c, { data: { confirmInvite } }) => {
       addMessage(confirmInvite, "Invite", "info");
       refetchUser();
     },
+    onError: errorHandler,
   });
 
   const [declineInvite, { loading: diLoading }] = useMutation(DECLINE_INVITE, {
-    onError(err) {
-      console.log(err);
-    },
     variables: { requestor: id },
-    update(c, { data: { declineInvite } }) {
+    update: (c, { data: { declineInvite } }) => {
       addMessage(declineInvite, "Invite", "info");
       refetchUser();
     },
+    onError: errorHandler,
   });
 
   let buttons;
