@@ -1,13 +1,9 @@
-import React, { useContext } from "react";
-
-import { AuthContext } from "../../context/auth";
+import React from "react";
 
 import { Feed, Icon } from "semantic-ui-react";
 
 const ChatMenuItem = (props) => {
-  const { setOpenChat, chat } = props;
-
-  const { userId } = useContext(AuthContext);
+  const { setOpenChat, chat, userId } = props;
 
   const chatName = chat.users
     .filter((user) => user.id !== userId)

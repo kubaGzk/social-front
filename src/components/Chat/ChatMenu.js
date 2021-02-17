@@ -7,6 +7,7 @@ import ChatWindow from "./ChatWindow";
 
 const ChatMenu = forwardRef((props, ref) => {
   const {
+    userId,
     chats,
     showChat,
     setShowChat,
@@ -57,6 +58,7 @@ const ChatMenu = forwardRef((props, ref) => {
               {chats.length > 0
                 ? chats.map((chat) => (
                     <ChatMenuItem
+                      userId={userId}
                       chat={chat}
                       key={chat.id}
                       setOpenChat={setOpenChat}
@@ -70,6 +72,7 @@ const ChatMenu = forwardRef((props, ref) => {
 
       {openChat && (
         <ChatWindow
+          userId={userId}
           setOpenChat={setOpenChat}
           chatId={openChat}
           openChatName={openChatName}

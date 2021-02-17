@@ -127,6 +127,7 @@ const ChatContainer = (props) => {
 
       <ChatMenu
         ref={menuRef}
+        userId={userId}
         showChat={showChat}
         setShowChat={setShowChat}
         openChat={openChat}

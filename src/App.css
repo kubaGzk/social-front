@@ -70,12 +70,12 @@
   align-items: center;
 }
 
-.post-card-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.post-card-dropdown {
+  padding: 0.78571429em  !important;
 }
-
+.post-card-dropdown i {
+  margin: 0 !important;
+}
 .login-container {
   background-color: #fff;
   border-radius: 0.28571429rem;
@@ -167,7 +167,7 @@
   }
 
   #file-uploader {
-    max-width: 220px;
+    max-width: 80%;
   }
 }
 

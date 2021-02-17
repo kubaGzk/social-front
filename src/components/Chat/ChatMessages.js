@@ -1,11 +1,9 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
+
 import ChatMessage from "./ChatMessage";
-import { AuthContext } from "../../context/auth";
 
 const ChatMessages = (props) => {
-  const { messages, users, writing } = props;
-
-  const { userId } = useContext(AuthContext);
+  const { userId, messages, users, writing } = props;
 
   const [scrollBottom, setScrollBottom] = useState(false);
 

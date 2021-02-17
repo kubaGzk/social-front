@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { AuthContext } from "../../context/auth";
 import {
   END_WRITING,
   FETCH_CHAT,
@@ -16,9 +15,7 @@ import { Comment, Input, Form, Card, Button, Icon } from "semantic-ui-react";
 import ChatMessages from "./ChatMessages";
 
 const ChatWindow = (props) => {
-  const { chatId, openChatName, setOpenChat } = props;
-
-  const { userId } = useContext(AuthContext);
+  const { userId, chatId, openChatName, setOpenChat } = props;
 
   const [textMessage, setTextMessage] = useState("");
 
@@ -139,6 +136,7 @@ const ChatWindow = (props) => {
         <Comment.Group size="mini">
           {chat && (
             <ChatMessages
+              userId={userId}
               users={chat.users}
               messages={chat.messages}
               writing={chat.writing}

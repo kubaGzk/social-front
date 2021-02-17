@@ -201,7 +201,7 @@ const PostCard = (props) => {
       </Card.Content>
       <Segment style={{ borderRadius: "0", borderWidth: "1px 0 0 0" }}>
         <Card.Content extra className="post-card-buttons">
-          <Button.Group>
+          <Button.Group size={width <= 350 ? "tiny" : "medium"}>
             <Popup
               hoverable
               trigger={
@@ -244,7 +244,12 @@ const PostCard = (props) => {
           {userId === localUser &&
             !editMode &&
             (width <= 768 ? (
-              <Dropdown icon="ellipsis vertical">
+              <Dropdown
+                icon="ellipsis vertical"
+                as={Button}
+                className={"right floated post-card-dropdown"}
+                size={width <= 350 ? "tiny" : "medium"}
+              >
                 <Dropdown.Menu direction="left">
                   <Dropdown.Item
                     text="Delete"
