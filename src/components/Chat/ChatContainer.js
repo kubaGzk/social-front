@@ -8,6 +8,7 @@ import {
   ON_CHANGE_CHAT_LIST,
   ON_NEW_CHAT,
 } from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
 
 import { Button, Ref } from "semantic-ui-react";
 import ChatMenu from "./ChatMenu";
@@ -24,8 +25,11 @@ const ChatContainer = (props) => {
   const btnRef = useRef();
   const menuRef = useRef();
 
-  const { data, loading, subscribeToMore, error } = useQuery(FETCH_CHATS, {
+  const { errorHandler } = useErrorHandler();
+
+  const { data, loading, subscribeToMore } = useQuery(FETCH_CHATS, {
     fetchPolicy: "cache-and-network",
+    onError: errorHandler,
   });
 
   useEffect(() => {

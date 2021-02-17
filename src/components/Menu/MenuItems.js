@@ -64,6 +64,7 @@ const MenuItems = (props) => {
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
               style={{ borderRadius: "inherit" }}
+              alt="Avatar"
             />
             <span style={{ paddingLeft: "1rem" }}>
               {firstname + " " + lastname}
@@ -109,6 +110,7 @@ const MenuItems = (props) => {
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
               style={{ borderRadius: "inherit" }}
+              alt="Avatar"
             />
             <span style={{ paddingLeft: "1rem" }}>
               {firstname + " " + lastname}

@@ -10,6 +10,7 @@ import {
   START_WRITING,
   WRITE_MESSAGE,
 } from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
 
 import { Comment, Input, Form, Card, Button, Icon } from "semantic-ui-react";
 import ChatMessages from "./ChatMessages";
@@ -23,20 +24,28 @@ const ChatWindow = (props) => {
 
   const timeoutRef = useRef();
 
+  const { errorHandler } = useErrorHandler();
+
   const { data, subscribeToMore } = useQuery(FETCH_CHAT, {
     variables: { chatId },
     fetchPolicy: "cache-and-network",
+    onError: errorHandler,
   });
 
   const [startWriting] = useMutation(START_WRITING, {
     variables: { chatId },
+    onError: errorHandler,
   });
-  const [endWriting] = useMutation(END_WRITING);
+  const [endWriting] = useMutation(END_WRITING, {
+    onError: errorHandler,
+  });
   const [sendMessage] = useMutation(WRITE_MESSAGE, {
     variables: { chatId: chatId, body: textMessage },
+    onError: errorHandler,
   });
   const [readMessage] = useMutation(READ_MESSAGE, {
     variables: { chatId },
+    onError: errorHandler,
   });
 
   useEffect(() => {
@@ -63,6 +72,12 @@ const ChatWindow = (props) => {
       endWriting({ variables: { chatId } });
     };
   }, [chatId]);
+
+  let chat;
+
+  if (data && data.getChat) {
+    chat = data.getChat;
+  }
 
   useEffect(() => {
     const unread = [];
@@ -95,12 +110,6 @@ const ChatWindow = (props) => {
       setTextMessage("");
     }
   };
-
-  let chat;
-
-  if (data && data.getChat) {
-    chat = data.getChat;
-  }
 
   return (
     <Card>

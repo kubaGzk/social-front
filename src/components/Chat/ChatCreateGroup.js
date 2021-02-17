@@ -6,6 +6,7 @@ import { CREATE_CHAT_GROUP } from "../../util/graphql";
 
 import { List, Modal, Grid, Image, Button } from "semantic-ui-react";
 import UserSearch from "../UserSearch/UserSearch";
+import ChatCreateGroupList from "./ChatCreateGroupList";
 
 const ChatCreateGroup = (props) => {
   const { closeModal, setShowChat, setOpenChat } = props;
@@ -27,14 +28,17 @@ const ChatCreateGroup = (props) => {
 
   const [createGroup, { loading }] = useMutation(CREATE_CHAT_GROUP, {
     onError: ({ graphQLErrors, networkError }) => {
+      let error =
+        "Unexpected issue occured, please try again later or contact Admin.";
+
       if (networkError) {
-        setError("Unexpected issue occured, please try again later.");
+        console.log(networkError);
       }
 
-      if (graphQLErrors) {
-        setError(graphQLErrors[0].message);
+      if (graphQLErrors && graphQLErrors[0]) {
+        error = graphQLErrors[0].message;
       }
-
+      setError(error);
       setTimeout(() => {
         setError();
       }, 3000);
@@ -82,23 +86,11 @@ const ChatCreateGroup = (props) => {
               />
             </Grid.Column>
             <Grid.Column>
-              <List>
-                {users.map((usr) => (
-                  <List.Item key={usr.id}>
-                    <Image avatar src={usr.image} />
-                    <List.Content>
-                      <List.Header>{usr.title}</List.Header>
-                      <List.Description onClick={() => removeUser(usr.id)}>
-                        {userId !== usr.id && (
-                          <span style={{ color: "red", cursor: "pointer" }}>
-                            Remove user
-                          </span>
-                        )}
-                      </List.Description>
-                    </List.Content>
-                  </List.Item>
-                ))}
-              </List>
+              <ChatCreateGroupList
+                userId={userId}
+                users={users}
+                removeUser={removeUser}
+              />
               <Button.Group size="mini">
                 <Button
                   positive

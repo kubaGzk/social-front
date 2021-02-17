@@ -25,6 +25,7 @@ const ChatMenuItem = (props) => {
     chatIcon = (
       <img
         src={`${process.env.REACT_APP_IMAGES_URL}/${chat.users[ind].image}`}
+        alt="Chat icon"
       />
     );
   }

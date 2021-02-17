@@ -39,13 +39,18 @@ const User = (props) => {
   const { data, refetch: refetchUser, loadingUser } = useQuery(
     FETCH_USER_INFO_QUERY,
     {
-      onError: (err) => {
-        let message = "Unexpected error";
+      onError: ({ graphQLErrors, networkError }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
 
-        if (err.graphQLErrors && err.graphQLErrors[0].message) {
-          message = err.graphQLErrors[0].message;
+        if (networkError) {
+          console.log(networkError);
         }
-        setLocalError(message);
+
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+        setLocalError(error);
 
         setTimeout(() => {
           setLocalError(null);

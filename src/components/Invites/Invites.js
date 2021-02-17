@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/client";
 
 import { DimensionContext } from "../../context/dimension";
 import { FETCH_INVITES } from "../../util/graphql";
+import { useErrorHandler } from "../../util/hooks";
 
 import { Grid, Header, List, Loader, Modal } from "semantic-ui-react";
 import InviteItems from "./InviteItems";
@@ -12,14 +13,17 @@ const Invites = (props) => {
 
   const { width } = useContext(DimensionContext);
 
+  const { errorHandler } = useErrorHandler();
+
   const { data, loading, refetch: refetchInvites } = useQuery(FETCH_INVITES, {
     fetchPolicy: "cache-and-network",
+    onError: errorHandler,
   });
 
   const closeModal = () => {
     setShowInvites(false);
   };
-  
+
   let invites = { sent: [], received: [] };
 
   if (data && data.getInvitations) invites = data.getInvitations;
