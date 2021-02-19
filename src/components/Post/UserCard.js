@@ -52,8 +52,15 @@ const UserCard = (props) => {
 
   const [sendInvite, { loading: siLoading }] = useMutation(CREATE_INVITE, {
     variables: { receiver: id },
-    update: (c, { data: { createInvite } }) => {
-      addMessage(createInvite, "Invite", "info");
+    update: (
+      c,
+      {
+        data: {
+          createInvite: { message },
+        },
+      }
+    ) => {
+      addMessage(message, "Invite", "info");
       refetchUser();
     },
     onError: errorHandler,
@@ -61,8 +68,15 @@ const UserCard = (props) => {
 
   const [confirmInvite, { loading: ciLoading }] = useMutation(CONFIRM_INVITE, {
     variables: { requestor: id },
-    update: (c, { data: { confirmInvite } }) => {
-      addMessage(confirmInvite, "Invite", "info");
+    update: (
+      c,
+      {
+        data: {
+          confirmInvite: { message },
+        },
+      }
+    ) => {
+      addMessage(message, "Invite", "info");
       refetchUser();
     },
     onError: errorHandler,
@@ -70,8 +84,15 @@ const UserCard = (props) => {
 
   const [declineInvite, { loading: diLoading }] = useMutation(DECLINE_INVITE, {
     variables: { requestor: id },
-    update: (c, { data: { declineInvite } }) => {
-      addMessage(declineInvite, "Invite", "info");
+    update: (
+      c,
+      {
+        data: {
+          declineInvite: { message },
+        },
+      }
+    ) => {
+      addMessage(message, "Invite", "info");
       refetchUser();
     },
     onError: errorHandler,

@@ -71,7 +71,7 @@ const ImageEditor = (props) => {
         <Modal.Description style={{ padding: "1em" }}></Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={closeModal}>Cancel</Button>
+        <Button onClick={closeModal} content="Cancel" />
         <Button
           content="Yep, that's fine"
           labelPosition="right"

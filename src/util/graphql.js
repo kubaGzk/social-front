@@ -265,17 +265,26 @@ export const UPDATE_USER = gql`
 
 export const CREATE_INVITE = gql`
   mutation createInvite($receiver: ID!) {
-    createInvite(receiver: $receiver)
+    createInvite(receiver: $receiver) {
+      message
+      inviteId
+    }
   }
 `;
 export const CONFIRM_INVITE = gql`
   mutation confirmInvite($requestor: ID!) {
-    confirmInvite(requestor: $requestor)
+    confirmInvite(requestor: $requestor) {
+      message
+      inviteId
+    }
   }
 `;
 export const DECLINE_INVITE = gql`
   mutation declineInvite($requestor: ID!) {
-    declineInvite(requestor: $requestor)
+    declineInvite(requestor: $requestor) {
+      message
+      inviteId
+    }
   }
 `;
 

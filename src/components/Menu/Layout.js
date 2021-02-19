@@ -1,5 +1,6 @@
 import { useApolloClient, useSubscription } from "@apollo/client";
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router";
 
 import { DimensionContext } from "../../context/dimension";
 import { MessageContext } from "../../context/message";
@@ -18,7 +19,11 @@ const Layout = (props) => {
 
   const { width } = useContext(DimensionContext);
   const { addMessage } = useContext(MessageContext);
-  const { userId, token } = useContext(AuthContext);
+  const { token, logout, firstname, lastname, image, userId } = useContext(
+    AuthContext
+  );
+  
+  const history = useHistory();
 
   const client = useApolloClient();
 
@@ -132,6 +137,13 @@ const Layout = (props) => {
                 toggleMenu={toggleSidebarMenu}
                 width={width}
                 toggleInvites={() => setShowInvites(true)}
+                token={token}
+                logout={logout}
+                firstname={firstname}
+                lastname={lastname}
+                image={image}
+                userId={userId}
+                history={history}
               />
             </Sidebar>
             <Sidebar.Pusher dimmed={showMenuRule}>
@@ -140,6 +152,13 @@ const Layout = (props) => {
                   toggleMenu={toggleSidebarMenu}
                   width={width}
                   toggleInvites={() => setShowInvites(true)}
+                  token={token}
+                  logout={logout}
+                  firstname={firstname}
+                  lastname={lastname}
+                  image={image}
+                  userId={userId}
+                  history={history}
                 />
                 {children}
               </Segment>
@@ -149,7 +168,7 @@ const Layout = (props) => {
         </Grid.Column>
       </Grid>
       {showInvites && (
-        <Invites showInvites={showInvites} setShowInvites={setShowInvites} />
+        <Invites setShowInvites={setShowInvites} />
       )}
       {token && <ChatContainer />}
     </>

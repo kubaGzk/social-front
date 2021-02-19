@@ -7,11 +7,11 @@ import {
   FETCH_CHATS,
   ON_CHANGE_CHAT_LIST,
   ON_NEW_CHAT,
-} from "../../../util/graphql";
+} from "../../util/graphql";
 
-import ChatMenu from "../ChatMenu";
-import ChatContainer from "../ChatContainer";
-import ChatMenuItem from "../ChatMenuItem";
+import ChatMenu from "../../components/Chat/ChatMenu";
+import ChatContainer from "../../components/Chat/ChatContainer";
+import ChatMenuItem from "../../components/Chat/ChatMenuItem";
 
 const mocks = [
   {

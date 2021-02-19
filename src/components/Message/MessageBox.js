@@ -1,13 +1,9 @@
-import React, { useContext } from "react";
-
-import { DimensionContext } from "../../context/dimension";
+import React from "react";
 
 import { Message } from "semantic-ui-react";
 
 const MessageBox = (props) => {
-  const { header, text, type, cb, dismiss } = props;
-
-  const { width } = useContext(DimensionContext);
+  const { header, text, type, cb, dismiss, width } = props;
 
   let msgSize = "small";
 

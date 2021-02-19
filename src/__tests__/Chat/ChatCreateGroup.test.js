@@ -1,13 +1,11 @@
 import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { mount } from "enzyme";
-import { act } from "react-dom/test-utils";
 
-import { CREATE_CHAT_GROUP } from "../../../util/graphql";
+import { CREATE_CHAT_GROUP } from "../../util/graphql";
 
 import { Button, Modal } from "semantic-ui-react";
-import ChatCreateGroup from "../ChatCreateGroup";
-import { GraphQLError } from "graphql";
+import ChatCreateGroup from "../../components/Chat/ChatCreateGroup";
 
 const mocks = [
   {
@@ -46,20 +44,6 @@ const mocks = [
           __typename: "Chat",
         },
       },
-    },
-  },
-];
-
-const setError = jest.fn();
-
-const errorMocks = [
-  {
-    request: {
-      query: CREATE_CHAT_GROUP,
-      variables: { users: ["user_1", "user_2"] },
-    },
-    result: {
-      errors: [[new GraphQLError("Error!")]],
     },
   },
 ];

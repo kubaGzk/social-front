@@ -1,8 +1,13 @@
 import React, { useContext } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 
 import { DimensionContext } from "../../context/dimension";
-import { FETCH_INVITES } from "../../util/graphql";
+import { AuthContext } from "../../context/auth";
+import {
+  FETCH_INVITES,
+  CONFIRM_INVITE,
+  DECLINE_INVITE,
+} from "../../util/graphql";
 import { useErrorHandler } from "../../util/hooks";
 
 import { Grid, Header, List, Loader, Modal } from "semantic-ui-react";
@@ -11,12 +16,73 @@ import InviteItems from "./InviteItems";
 const Invites = (props) => {
   const { setShowInvites } = props;
 
+  const { userId } = useContext(AuthContext);
   const { width } = useContext(DimensionContext);
 
   const { errorHandler } = useErrorHandler();
 
   const { data, loading, refetch: refetchInvites } = useQuery(FETCH_INVITES, {
     fetchPolicy: "cache-and-network",
+    onError: errorHandler,
+  });
+
+  const [confirmInvite] = useMutation(CONFIRM_INVITE, {
+    update: (
+      cache,
+      {
+        data: {
+          confirmInvite: { inviteId },
+        },
+      }
+    ) => {
+      const cachedId = cache.identify({
+        __typename: "UserInfo",
+        id: inviteId,
+      });
+
+      cache.modify({
+        id: cachedId,
+        fields: {
+          invitesSend(cachedInvites) {
+            return cachedInvites.filter((inv) => inv !== userId);
+          },
+          friends(cachedFriends) {
+            return [...cachedFriends, userId];
+          },
+        },
+      });
+
+      refetchInvites();
+    },
+    onError: errorHandler,
+  });
+
+  const [declineInvite] = useMutation(DECLINE_INVITE, {
+    update: (
+      cache,
+      {
+        data: {
+          declineInvite: { inviteId },
+        },
+      }
+    ) => {
+      console.log(data);
+      const cachedId = cache.identify({
+        __typename: "UserInfo",
+        id: inviteId,
+      });
+
+      cache.modify({
+        id: cachedId,
+        fields: {
+          invitesSend(cachedInvites) {
+            return cachedInvites.filter((inv) => inv !== userId);
+          },
+        },
+      });
+
+      refetchInvites();
+    },
     onError: errorHandler,
   });
 
@@ -44,6 +110,8 @@ const Invites = (props) => {
                     received
                     refetchInvites={refetchInvites}
                     closeModal={closeModal}
+                    confirmInvite={confirmInvite}
+                    declineInvite={declineInvite}
                   />
                 </List>
               </Grid.Row>

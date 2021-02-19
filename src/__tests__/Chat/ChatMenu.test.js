@@ -1,10 +1,10 @@
 import React from "react";
-import { shallow, mount } from "enzyme";
+import { shallow } from "enzyme";
 
-import ChatMenu from "../ChatMenu";
 import { Button, Feed } from "semantic-ui-react";
-import ChatWindow from "../ChatWindow";
-import ChatCreateGroup from "../ChatCreateGroup";
+import ChatMenu from "../../components/Chat/ChatMenu";
+import ChatWindow from "../../components/Chat/ChatWindow";
+import ChatCreateGroup from "../../components/Chat/ChatCreateGroup";
 
 describe("<Chat Menu />", () => {
   it("Render no chat", () => {

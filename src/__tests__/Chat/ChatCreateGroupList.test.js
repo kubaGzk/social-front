@@ -2,7 +2,7 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import { List } from "semantic-ui-react";
-import ChatCreateGroupList from "../ChatCreateGroupList";
+import ChatCreateGroupList from "../../components/Chat/ChatCreateGroupList";
 
 describe("<ChatCreateGroupList />", () => {
   let wrapper;

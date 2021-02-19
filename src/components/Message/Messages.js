@@ -4,9 +4,11 @@ import { MessageContext } from "../../context/message";
 
 import { TransitionGroup } from "semantic-ui-react";
 import MessageBox from "./MessageBox";
+import { DimensionContext } from "../../context/dimension";
 
 const Messages = () => {
   const { messages, removeMessage } = useContext(MessageContext);
+  const { width } = useContext(DimensionContext);
 
   return (
     <TransitionGroup>
@@ -19,6 +21,7 @@ const Messages = () => {
             type={msg.type}
             cb={msg.cb}
             dismiss={() => removeMessage(msg.id)}
+            width={width}
           />
         ))}
       </div>

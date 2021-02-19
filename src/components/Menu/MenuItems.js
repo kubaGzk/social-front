@@ -1,21 +1,22 @@
-import React, { useContext } from "react";
-import { Link, useHistory } from "react-router-dom";
-
-import { AuthContext } from "../../context/auth";
-import { DimensionContext } from "../../context/dimension";
+import React from "react";
+import { Link } from "react-router-dom";
 
 import { Button, Label, Menu, Dropdown } from "semantic-ui-react";
 import UserSearch from "../UserSearch/UserSearch";
 
 const MenuItems = (props) => {
-  const { toggleMenu, toggleInvites } = props;
-
-  const { token, logout, firstname, lastname, image, userId } = useContext(
-    AuthContext
-  );
-  const { width } = useContext(DimensionContext);
-
-  const history = useHistory();
+  const {
+    toggleMenu,
+    toggleInvites,
+    token,
+    logout,
+    firstname,
+    lastname,
+    image,
+    userId,
+    width,
+    history,
+  } = props;
 
   const resultSelect = (e, data) => {
     toggleMenu && toggleMenu();
@@ -58,7 +59,6 @@ const MenuItems = (props) => {
               justifyContent: "space-beetwen",
               alignItems: "center",
             }}
-            onClick={toggleMenu}
             to={`/user/${userId}`}
           >
             <img
