@@ -1,9 +1,9 @@
 import React from "react";
 import { shallow } from "enzyme";
 
-import { Button, Dropdown, Item, Label, Menu } from "semantic-ui-react";
-import MenuItems from "../../components/Menu/MenuItems";
-import UserSearch from "../../components/UserSearch/UserSearch";
+import { Button, Dropdown, Label, Menu } from "semantic-ui-react";
+import MenuItems from "../../../components/Menu/MenuItems";
+import UserSearch from "../../../components/UserSearch/UserSearch";
 
 describe("<MenuItems />", () => {
   const toggleMenu = jest.fn();

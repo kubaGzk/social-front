@@ -3,16 +3,15 @@ import { MockedProvider } from "@apollo/client/testing";
 import { mount } from "enzyme";
 import { BrowserRouter } from "react-router-dom";
 
-import { AuthContext } from "../../context/auth";
-import { DimensionContext } from "../../context/dimension";
-import { MessageContext } from "../../context/message";
-import { ON_INVITE } from "../../util/graphql";
+import { AuthContext } from "../../../context/auth";
+import { DimensionContext } from "../../../context/dimension";
+import { MessageContext } from "../../../context/message";
+import { ON_INVITE } from "../../../util/graphql";
 
-import Layout from "../../components/Menu/Layout";
-import { Menu, Sidebar } from "semantic-ui-react";
-import MenuBar from "../../components/Menu/MenuBar";
-import ChatContainer from "../../components/Chat/ChatContainer";
-import Invites from "../../components/Invites/Invites";
+import {  Sidebar } from "semantic-ui-react";
+import Layout from "../../../components/Menu/Layout";
+import MenuBar from "../../../components/Menu/MenuBar";
+import ChatContainer from "../../../components/Chat/ChatContainer";
 
 const mocks = [{ request: { query: ON_INVITE } }];
 

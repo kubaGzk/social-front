@@ -2,8 +2,8 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import { List } from "semantic-ui-react";
-import InviteItems from "../../components/Invites/InviteItems";
-import InviteItem from "../../components/Invites/InviteItem";
+import InviteItems from "../../../components/Invites/InviteItems";
+import InviteItem from "../../../components/Invites/InviteItem";
 
 describe("<InviteItems />", () => {
   let wrapper;

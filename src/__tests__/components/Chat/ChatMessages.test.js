@@ -1,7 +1,7 @@
 import React from "react";
 import { shallow } from "enzyme";
-import ChatMessages from "../../components/Chat/ChatMessages";
-import ChatMessage from "../../components/Chat/ChatMessage";
+import ChatMessages from "../../../components/Chat/ChatMessages";
+import ChatMessage from "../../../components/Chat/ChatMessage";
 
 describe("<ChatMessages />", () => {
   //userId, messages, users, writing

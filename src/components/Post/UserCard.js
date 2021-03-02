@@ -110,11 +110,11 @@ const UserCard = (props) => {
   } else if (invitesSend.indexOf(userId) !== -1) {
     buttons = (
       <>
-        <Button positive onClick={confirmInvite}>
+        <Button positive={true} onClick={confirmInvite}>
           Accept Invite
         </Button>
         <Button.Or />
-        <Button negative onClick={declineInvite}>
+        <Button negative={true} onClick={declineInvite}>
           Decline Invite
         </Button>
       </>
@@ -148,7 +148,7 @@ const UserCard = (props) => {
         <Card.Content>
           <Item.Group style={{ marginBottom: "0" }}>
             <Item>
-              {editMode ? (
+              {token && editMode ? (
                 <EditProfile
                   firstname={firstname}
                   lastname={lastname}

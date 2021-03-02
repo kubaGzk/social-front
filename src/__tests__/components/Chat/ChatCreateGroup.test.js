@@ -2,10 +2,10 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { mount } from "enzyme";
 
-import { CREATE_CHAT_GROUP } from "../../util/graphql";
+import { CREATE_CHAT_GROUP } from "../../../util/graphql";
 
 import { Button, Modal } from "semantic-ui-react";
-import ChatCreateGroup from "../../components/Chat/ChatCreateGroup";
+import ChatCreateGroup from "../../../components/Chat/ChatCreateGroup";
 
 const mocks = [
   {

@@ -2,7 +2,7 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import { Feed } from "semantic-ui-react";
-import ChatMenuItem from "../../components/Chat/ChatMenuItem";
+import ChatMenuItem from "../../../components/Chat/ChatMenuItem";
 
 describe("<ChatMenuItem />", () => {
   let wrapper;

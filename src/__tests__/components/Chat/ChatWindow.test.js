@@ -9,11 +9,11 @@ import {
   END_WRITING,
   START_WRITING,
   WRITE_MESSAGE,
-} from "../../util/graphql";
+} from "../../../util/graphql";
 
 import { Card } from "semantic-ui-react";
-import ChatMessages from "../../components/Chat/ChatMessages";
-import ChatWindow from "../../components/Chat/ChatWindow";
+import ChatMessages from "../../../components/Chat/ChatMessages";
+import ChatWindow from "../../../components/Chat/ChatWindow";
 
 const mocks = [
   {

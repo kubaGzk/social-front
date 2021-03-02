@@ -2,8 +2,8 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import { Button } from "semantic-ui-react";
-import MenuBar from "../../components/Menu/MenuBar";
-import MenuItems from "../../components/Menu/MenuItems";
+import MenuBar from "../../../components/Menu/MenuBar";
+import MenuItems from "../../../components/Menu/MenuItems";
 
 describe("<MenuBar />", () => {
   let wrapper;

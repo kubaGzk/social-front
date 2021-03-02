@@ -1,8 +1,9 @@
 import React from "react";
 import { shallow } from "enzyme";
-import ImageEditor from "../../components/Image/ImageEditor";
 import AvatarEditor from "react-avatar-editor";
+
 import { Button } from "semantic-ui-react";
+import ImageEditor from "../../../components/Image/ImageEditor";
 
 describe("<ImageEditor />", () => {
   let wrapper;

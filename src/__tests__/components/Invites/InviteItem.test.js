@@ -2,7 +2,7 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import { Button, List } from "semantic-ui-react";
-import InviteItem from "../../components/Invites/InviteItem";
+import InviteItem from "../../../components/Invites/InviteItem";
 
 describe("<InviteItem />", () => {
   const closeModal = jest.fn();

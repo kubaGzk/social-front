@@ -1,7 +1,7 @@
 import React from "react";
 import { shallow } from "enzyme";
 
-import ChatMessage from "../../components/Chat/ChatMessage";
+import ChatMessage from "../../../components/Chat/ChatMessage";
 
 describe("<ChatMessage />", () => {
   it("Render own message", () => {

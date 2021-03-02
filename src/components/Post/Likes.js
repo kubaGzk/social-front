@@ -1,11 +1,13 @@
 import React from "react";
 
 const Likes = (props) => {
+  const { likes } = props;
+
   let body = "No likes";
 
-  if (props.likes.length > 0) {
-    body = props.likes.reduce((accBody, like, ind) => {
-      ind === 10 && accBody.push(<p>...</p>);
+  if (likes.length > 0) {
+    body = likes.reduce((accBody, like, ind) => {
+      ind === 10 && accBody.push(<p key={like.id}>...</p>);
       ind < 10 &&
         accBody.push(
           <p

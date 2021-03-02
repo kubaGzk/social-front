@@ -4,17 +4,17 @@ import { act } from "react-dom/test-utils";
 import { MockedProvider } from "@apollo/client/testing";
 import { BrowserRouter } from "react-router-dom";
 
-import { AuthContext } from "../../context/auth";
-import { DimensionContext } from "../../context/dimension";
+import { AuthContext } from "../../../context/auth";
+import { DimensionContext } from "../../../context/dimension";
 import {
   CONFIRM_INVITE,
   DECLINE_INVITE,
   FETCH_INVITES,
-} from "../../util/graphql";
+} from "../../../util/graphql";
 
 import { Loader } from "semantic-ui-react";
-import Invites from "../../components/Invites/Invites";
-import InviteItems from "../../components/Invites/InviteItems";
+import Invites from "../../../components/Invites/Invites";
+import InviteItems from "../../../components/Invites/InviteItems";
 
 const mocks = [
   {
