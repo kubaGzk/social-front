@@ -1,11 +1,12 @@
-import { useMutation } from "@apollo/react-hooks";
 import React, { useContext, useState } from "react";
+import { useMutation } from "@apollo/client";
 
-import { Button, Form } from "semantic-ui-react";
-import ImageEditor from "../components/Image/ImageEditor";
 import { AuthContext } from "../context/auth";
 import { REGISTER_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Button, Form } from "semantic-ui-react";
+import ImageEditor from "../components/Image/ImageEditor";
 
 const INITIAL_STATE = {
   username: "",
@@ -26,7 +27,7 @@ const Register = (props) => {
   const [values, onChange, onSubmit] = useForm(registerHandler, INITIAL_STATE);
 
   const [addUser, { loading }] = useMutation(REGISTER_USER, {
-    update(_, result) {
+    update: (_, result) => {
       const {
         data: {
           register: { id, email, token, firstname, lastname, image },
@@ -35,8 +36,27 @@ const Register = (props) => {
       login(token, firstname, lastname, image, id, email);
       props.history.push("/");
     },
-    onError(err) {
-      setErrors(err.graphQLErrors[0].extensions.exception.errors);
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        console.log(networkError);
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
+
+      if (
+        graphQLErrors &&
+        graphQLErrors[0] &&
+        graphQLErrors[0]?.extensions?.exception?.errors
+      ) {
+        setErrors(graphQLErrors[0].extensions.exception.errors);
+      } else {
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
     },
     variables: values,
   });

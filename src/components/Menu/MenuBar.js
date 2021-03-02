@@ -1,13 +1,22 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { Menu, Icon, Button } from "semantic-ui-react";
-import { DimensionContext } from "../../context/dimension";
+
 import MenuItems from "./MenuItems";
+import { Menu, Icon, Button } from "semantic-ui-react";
 
 const MenuBar = (props) => {
-  const { width } = useContext(DimensionContext);
-
-  const { toggleMenu } = props;
+  const {
+    toggleMenu,
+    toggleInvites,
+    token,
+    logout,
+    firstname,
+    lastname,
+    image,
+    userId,
+    width,
+    history,
+  } = props;
 
   return (
     <Menu
@@ -21,7 +30,17 @@ const MenuBar = (props) => {
       </Menu.Item>
       <Menu.Menu vertical="true" position="right">
         {width > 767 ? (
-          <MenuItems />
+          <MenuItems
+            toggleInvites={toggleInvites}
+            token={token}
+            logout={logout}
+            firstname={firstname}
+            lastname={lastname}
+            image={image}
+            userId={userId}
+            history={history}
+            width={width}
+          />
         ) : (
           <Menu.Item>
             <Button icon="sidebar" onClick={toggleMenu} />

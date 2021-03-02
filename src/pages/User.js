@@ -1,9 +1,11 @@
-import { useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
-import PostCard from "../components/Post/PostCard";
+import { useQuery } from "@apollo/client";
+
 import { useGetPosts } from "../util/hooks";
 import { FETCH_USER_INFO_QUERY } from "../util/graphql";
+
+import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
+import PostCard from "../components/Post/PostCard";
 import UserCard from "../components/Post/UserCard";
 
 const User = (props) => {
@@ -11,37 +13,79 @@ const User = (props) => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { error, posts, setError, dataComplete, loading } = useGetPosts(
-    props.match.params.id
-  );
+  const {
+    error,
+    posts,
+    setError,
+    dataComplete,
+    loading,
+    refetch: refetchPosts,
+  } = useGetPosts(props.match.params.id);
 
   const [localError, setLocalError] = useState();
 
+  const [message, setMessage] = useState();
+
+  const showMessage = (messText) => {
+    setMessage(messText);
+
+    setTimeout(() => {
+      setMessage(null);
+    }, 5000);
+  };
+
   let user;
 
-  const { data } = useQuery(FETCH_USER_INFO_QUERY, {
-    onError: (err) => {
-      let message = "Unexpected error";
+  const { data, refetch: refetchUser, loadingUser } = useQuery(
+    FETCH_USER_INFO_QUERY,
+    {
+      onError: ({ graphQLErrors, networkError }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
 
-      if (err.graphQLErrors && err.graphQLErrors[0].message) {
-        message = err.graphQLErrors[0].message;
-      }
-      setLocalError(message);
+        if (networkError) {
+          console.log(networkError);
+        }
 
-      setTimeout(() => {
-        setLocalError(null);
-      }, 5000);
-    },
-    variables: { userId: props.match.params.id },
-  });
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+        setLocalError(error);
+
+        setTimeout(() => {
+          setLocalError(null);
+        }, 3000);
+      },
+      variables: { userId: props.match.params.id },
+      fetchPolicy: "cache-and-network",
+    }
+  );
 
   if (data && data.getUserInfo) user = data.getUserInfo;
 
   return (
     <Grid style={{ margin: "0" }}>
       <Grid.Column className="post-column">
+        {message && (
+          <Message
+            info
+            size="small"
+            style={{ position: "fixed", top: "5%", zIndex: "100" }}
+          >
+            <Message.Header>Message</Message.Header>
+            {message}
+          </Message>
+        )}
         <TransitionGroup>
-          {user && <UserCard user={user} />}
+          {user && (
+            <UserCard
+              user={user}
+              refetchUser={refetchUser}
+              loading={loadingUser}
+              showMessage={showMessage}
+              refetchPosts={refetchPosts}
+            />
+          )}
           {posts.map((post) => (
             <Grid.Row key={post.id + "_postcard"} className="post-item">
               <PostCard post={post} showError={setError} />

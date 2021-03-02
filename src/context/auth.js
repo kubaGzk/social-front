@@ -1,6 +1,7 @@
-import { useMutation } from "@apollo/react-hooks";
 import React, { createContext, useCallback, useReducer } from "react";
+import { useApolloClient, useMutation } from "@apollo/client";
 import jwtDecode from "jwt-decode";
+
 import { VALIDATE_TOKEN } from "../util/graphql";
 
 const INITIAL_STATE = {
@@ -19,6 +20,7 @@ const AuthContext = createContext({
   login: () => {},
   logout: () => {},
   checkLocal: () => {},
+  updateUserData: () => {},
 });
 
 const authReducer = (state, action) => {
@@ -41,6 +43,14 @@ const authReducer = (state, action) => {
     case "ERROR":
       return { ...INITIAL_STATE, error: action.error };
 
+    case "UPDATE":
+      return {
+        ...state,
+        image: action.image,
+        firstname: action.firstname,
+        lastname: action.lastname,
+      };
+
     default:
       return state;
   }
@@ -48,15 +58,25 @@ const authReducer = (state, action) => {
 
 const AuthContextProvider = (props) => {
   const [
-    { token, username, firstname, lastname, image, userId, email, error },
+    { token, firstname, lastname, image, userId, email },
     dispatch,
   ] = useReducer(authReducer, INITIAL_STATE);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("expiresIn");
+  const client = useApolloClient();
 
+  const logout = () => {
     dispatch({ type: "LOGOUT" });
+
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("expiresIn");
+      client.resetStore();
+    });
+
+    props.wsLink.subscriptionClient.close(true, true);
+    setTimeout(() => {
+      props.wsLink.subscriptionClient.connect();
+    });
   };
 
   const login = (
@@ -80,6 +100,13 @@ const AuthContextProvider = (props) => {
       userId: funUserId,
       email: funEmail,
     });
+
+    props.wsLink.subscriptionClient.close(true, true);
+
+    setTimeout(() => {
+      props.wsLink.subscriptionClient.connect();
+    });
+
     setTimeout(() => {
       logout();
     }, expirationDate);
@@ -111,7 +138,7 @@ const AuthContextProvider = (props) => {
       );
     },
     onError(err) {
-      console.log(err.graphQLErrors);
+      console.log(err);
       logout();
     },
   });
@@ -124,6 +151,10 @@ const AuthContextProvider = (props) => {
       exp * 1000 - Date.now() > 0 ? validateToken() : logout();
     }
   }, [validateToken, logout]);
+
+  const updateUserData = (firstname, lastname, image) => {
+    dispatch({ type: "UPDATE", firstname, lastname, image });
+  };
 
   return (
     <AuthContext.Provider
@@ -138,12 +169,12 @@ const AuthContextProvider = (props) => {
         login: (...args) => login(...args),
         logout: () => logout(),
         checkLocal: () => checkLocal(),
+        updateUserData: (firstname, lastname, image) =>
+          updateUserData(firstname, lastname, image),
       }}
       {...props}
     />
   );
 };
-
-
 
 export { AuthContext, AuthContextProvider };

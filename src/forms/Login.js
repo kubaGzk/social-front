@@ -1,9 +1,11 @@
-import { useMutation } from "@apollo/react-hooks";
-import React, { useState, useContext, useAuth } from "react";
-import { Button, Form } from "semantic-ui-react";
+import React, { useState, useContext } from "react";
+import { useMutation } from "@apollo/client";
+
 import { AuthContext } from "../context/auth";
 import { LOGIN_USER } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Button, Form } from "semantic-ui-react";
 
 const INITIAL_STATE = {
   username: "",
@@ -12,12 +14,13 @@ const INITIAL_STATE = {
 
 const Login = (props) => {
   const { login } = useContext(AuthContext);
+
   const [errors, setErrors] = useState({});
 
   const [values, onChange, onSubmit] = useForm(loginHandler, INITIAL_STATE);
 
   const [userLogin, { loading }] = useMutation(LOGIN_USER, {
-    update(_, result) {
+    update: (_, result) => {
       const {
         data: {
           login: { id, email, token, firstname, lastname, image },
@@ -28,9 +31,27 @@ const Login = (props) => {
       props.history.push("/");
     },
 
-    onError(err) {
-      console.log(err.graphQLErrors[0].extensions.exception.errors);
-      setErrors(err.graphQLErrors[0].extensions.exception.errors);
+    onError: ({ graphQLErrors, networkError }) => {
+      if (networkError) {
+        console.log(networkError);
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
+
+      if (
+        graphQLErrors &&
+        graphQLErrors[0] &&
+        graphQLErrors[0]?.extensions?.exception?.errors
+      ) {
+        setErrors(graphQLErrors[0].extensions.exception.errors);
+      } else {
+        setErrors({
+          general:
+            "Unexpected issue occured, please try again later or contact Admin.",
+        });
+      }
     },
     variables: values,
   });
@@ -79,7 +100,5 @@ const Login = (props) => {
     </div>
   );
 };
-
-
 
 export default Login;

@@ -1,15 +1,27 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Icon, Input, Label, Menu } from "semantic-ui-react";
-import { AuthContext } from "../../context/auth";
-import { DimensionContext } from "../../context/dimension";
+
+import { Button, Label, Menu, Dropdown } from "semantic-ui-react";
+import UserSearch from "../UserSearch/UserSearch";
 
 const MenuItems = (props) => {
-  const { token, logout, firstname, lastname, image } = useContext(AuthContext);
-    const {width} = useContext(DimensionContext)
+  const {
+    toggleMenu,
+    toggleInvites,
+    token,
+    logout,
+    firstname,
+    lastname,
+    image,
+    userId,
+    width,
+    history,
+  } = props;
 
-  const { toggleMenu } = props;
-
+  const resultSelect = (e, data) => {
+    toggleMenu && toggleMenu();
+    data.result.id && history.push(`/user/${data.result.id}`);
+  };
 
   let menuItems = (
     <>
@@ -33,31 +45,59 @@ const MenuItems = (props) => {
     menuItems = (
       <>
         <Menu.Item style={{ maxWidth: "80%" }}>
-          <Input
-            action={{ type: "submit", content: <Icon name="search" /> }}
+          <UserSearch
             placeholder="Search for friend..."
+            resultSelect={resultSelect}
           />
         </Menu.Item>
-        <Menu.Item name="logout" onClick={logout} as={Link} to="/" />
         <Menu.Item style={{ maxWidth: "13rem" }}>
           <Label
-            as="a"
+            as={Link}
             style={{
               marginLeft: "0",
               display: "flex",
               justifyContent: "space-beetwen",
               alignItems: "center",
             }}
-            onClick={toggleMenu}
+            to={`/user/${userId}`}
           >
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
               style={{ borderRadius: "inherit" }}
+              alt="Avatar"
             />
             <span style={{ paddingLeft: "1rem" }}>
               {firstname + " " + lastname}
             </span>
           </Label>
+        </Menu.Item>
+        <Menu.Item style={{ padding: "0" }}>
+          <Dropdown
+            icon="ellipsis vertical"
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "4rem",
+            }}
+          >
+            <Dropdown.Menu>
+              <Dropdown.Item
+                text="Invites"
+                icon="group"
+                onClick={toggleInvites}
+              />
+              <Dropdown.Divider />
+              <Dropdown.Item
+                text="Logout"
+                onClick={logout}
+                as={Link}
+                to="/"
+                icon="sign-out"
+              />
+            </Dropdown.Menu>
+          </Dropdown>
         </Menu.Item>
       </>
     );
@@ -66,10 +106,11 @@ const MenuItems = (props) => {
       <>
         <Menu.Item />
         <Menu.Item style={{ display: "flex" }}>
-          <Label as="a" onClick={toggleMenu}>
+          <Label onClick={toggleMenu} as={Link} to={`/user/${userId}`}>
             <img
               src={process.env.REACT_APP_IMAGES_URL + "/" + image}
               style={{ borderRadius: "inherit" }}
+              alt="Avatar"
             />
             <span style={{ paddingLeft: "1rem" }}>
               {firstname + " " + lastname}
@@ -78,12 +119,19 @@ const MenuItems = (props) => {
         </Menu.Item>
         <Menu.Item />
         <Menu.Item style={{ width: "100%" }}>
-          <Input
-            action={{ type: "submit", content: <Icon name="search" /> }}
+          <UserSearch
             placeholder="Search for friend..."
-            size="mini"
+            resultSelect={resultSelect}
           />
         </Menu.Item>
+        <Menu.Item />
+        <Menu.Item
+          name="invites"
+          onClick={() => {
+            toggleMenu();
+            toggleInvites();
+          }}
+        />
         <Menu.Item />
         <Menu.Item
           name="logout"

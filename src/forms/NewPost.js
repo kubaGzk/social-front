@@ -1,40 +1,44 @@
-import { useMutation } from "@apollo/react-hooks";
 import React, { useState } from "react";
-import { Card, Form, Grid, TextArea, Input } from "semantic-ui-react";
+import { useMutation } from "@apollo/client";
+
 import { CREATE_POST, FETCH_POSTS_QUERY } from "../util/graphql";
 import { useForm } from "../util/hooks";
+
+import { Card, Form, Grid, TextArea, Input } from "semantic-ui-react";
 
 const INITIAL_STATE = { body: "", image: null };
 
 const NewPost = (props) => {
+  const [error, setError] = useState();
+
   const [values, onChange, onSubmit, onClear] = useForm(
     submitPostHandler,
     INITIAL_STATE
   );
 
-  const [error, setError] = useState();
-
   const [submitPost, { loading }] = useMutation(CREATE_POST, {
-    update(cache, { data: { createPost: postData } }) {
+    update: (cache, { data: { createPost: postData } }) => {
       //CLEANING FORM
       onClear();
       document.getElementById("file-uploader").value = "";
 
-      const data = cache.readQuery({ query: FETCH_POSTS_QUERY });
-
       cache.writeQuery({
         query: FETCH_POSTS_QUERY,
-        data: { getPosts: [postData, ...data.getPosts] },
+        data: { getPosts: [postData] },
       });
     },
-    onError(err) {
-      let errMsg = "Unexpected error";
-      if (err && err.graphQLErrors[0] && err.graphQLErrors[0].message)
-        errMsg = err.graphQLErrors[0].message;
+    onError: ({ graphQLErrors, networkError }) => {
+      let error =
+        "Unexpected issue occured, please try again later or contact Admin.";
+      if (networkError) {
+        console.log(networkError);
+      }
 
-      console.log(errMsg, err);
+      if (graphQLErrors && graphQLErrors[0]) {
+        error = graphQLErrors[0].message;
+      }
 
-      setError(errMsg);
+      setError(error);
       setTimeout(() => {
         setError(null);
       }, 5000);

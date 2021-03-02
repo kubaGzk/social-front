@@ -1,15 +1,18 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
-import "semantic-ui-css/semantic.min.css";
-import "./App.css";
+import React, { useContext, useEffect} from "react";
 import {
   Redirect,
   Route,
   BrowserRouter as Router,
   Switch,
 } from "react-router-dom";
-import Home from "./pages/Home";
-import { Container, Dimmer, Loader } from "semantic-ui-react";
+
 import { AuthContext } from "./context/auth";
+
+import "./App.css";
+import "semantic-ui-css/semantic.min.css";
+
+import { Container, Dimmer, Loader } from "semantic-ui-react";
+import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Menu/Layout";
 import User from "./pages/User";
@@ -21,31 +24,16 @@ function App() {
     checkLocal();
   }, []);
 
-  let routes = (
-    <>
-      <Route exact path="/" component={Home} />
-      <Route exact path="/login" component={LoginPage} />
-      <Route exact path="/user/:id" component={User} />
-    </>
-  );
-
-  if (token) {
-    routes = (
-      <>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/user/:id" component={User} />
-      </>
-    );
-  }
-
   return (
     <div className="App" id="App">
       <Router>
         <Layout>
           <Container className="body-container">
             <Switch>
-              {routes}
-              <Redirect to="/" />
+              {!token && <Route exact path="/login" component={LoginPage} />}
+              <Route exact path="/user/:id" component={User} />
+              <Route exact path="/" component={Home} />
+              <Route render={() => <Redirect to="/" />} />
             </Switch>
           </Container>
         </Layout>

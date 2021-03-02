@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
-import { Modal, Button, Header, Grid } from "semantic-ui-react";
+import React, { useState } from "react";
 import AvatarEditor from "react-avatar-editor";
+
+import { Modal, Button, Header, Grid } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
 const ImageEditor = (props) => {
@@ -10,18 +11,18 @@ const ImageEditor = (props) => {
 
   let editorRef;
 
-  const closeModal = () => {
-    document.getElementById("avatar-image-select").value = "";
-    changeValue({ target: { files: [], name: "image" } });
-    setShowModal(false);
-  };
-
   const sliderSett = {
     start: 1,
     min: 1,
     max: 2,
     step: 0.25,
     onChange: (value) => setImageZoom(value),
+  };
+
+  const closeModal = () => {
+    document.getElementById("avatar-image-select").value = "";
+    changeValue({ target: { files: [], name: "image" } });
+    setShowModal(false);
   };
 
   const confirmImage = () => {
@@ -70,7 +71,7 @@ const ImageEditor = (props) => {
         <Modal.Description style={{ padding: "1em" }}></Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={closeModal}>Cancel</Button>
+        <Button onClick={closeModal} content="Cancel" />
         <Button
           content="Yep, that's fine"
           labelPosition="right"

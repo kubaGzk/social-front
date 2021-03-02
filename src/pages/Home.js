@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from "react";
-import PostCard from "../components/Post/PostCard";
-import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
-import NewPost from "../forms/NewPost";
+
 import { useGetPosts } from "../util/hooks";
 import { AuthContext } from "../context/auth";
+
+import { Grid, Loader, TransitionGroup, Message } from "semantic-ui-react";
+import PostCard from "../components/Post/PostCard";
+import NewPost from "../forms/NewPost";
 
 const Home = (props) => {
   const { error, posts, setError, dataComplete, loading } = useGetPosts();

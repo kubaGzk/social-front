@@ -1,8 +1,16 @@
-import { useQuery } from "@apollo/client";
-import { useContext, useState, useEffect, useCallback } from "react";
+import { useApolloClient, useQuery } from "@apollo/client";
+import { useContext, useState, useEffect } from "react";
+
 import { AuthContext } from "../context/auth";
 import { DimensionContext } from "../context/dimension";
-import { FETCH_POSTS_QUERY } from "./graphql";
+import { MessageContext } from "../context/message";
+
+import {
+  FETCH_POSTS_QUERY,
+  ON_DEL_POST,
+  ON_EDIT_POST,
+  ON_NEW_POST,
+} from "./graphql";
 
 export const useForm = (callback, initialState = {}) => {
   const [values, setValues] = useState(initialState);
@@ -31,30 +39,54 @@ export const useForm = (callback, initialState = {}) => {
 export const useGetPosts = (userId) => {
   const { token } = useContext(AuthContext);
   const { height, scrollY, scrollHeight } = useContext(DimensionContext);
+  const { addMessage } = useContext(MessageContext);
 
   const [postsOffset, setOffset] = useState(0);
   const [dataComplete, setDataComplete] = useState(false);
   const [error, setError] = useState();
 
-  const { loading, data, fetchMore, client } = useQuery(FETCH_POSTS_QUERY, {
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data) => {
-      if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
-        setDataComplete(true);
-    },
-    variables: { userId: userId },
-  });
+  const client = useApolloClient();
+
+  const { loading, data, fetchMore, refetch, subscribeToMore } = useQuery(
+    FETCH_POSTS_QUERY,
+    {
+      notifyOnNetworkStatusChange: true,
+      onCompleted: (data) => {
+        if (data.getPosts.length === postsOffset || data.getPosts.length < 10)
+          setDataComplete(true);
+      },
+      onError: ({ networkError, graphQLErrors }) => {
+        let error =
+          "Unexpected issue occured, please try again later or contact Admin.";
+        if (networkError) {
+          console.log(networkError);
+        }
+
+        if (graphQLErrors && graphQLErrors[0]) {
+          error = graphQLErrors[0].message;
+        }
+
+        addMessage(error, "Error", "negative");
+      },
+      variables: { userId: userId },
+    }
+  );
 
   let posts = [];
   if (data && data.getPosts) posts = data.getPosts;
 
   useEffect(() => {
     postsOffset !== posts.length && setOffset(posts.length);
-  }, [posts]);
+  }, [posts, data]);
 
   useEffect(() => {
     //56px - Loader size
-    if (height + scrollY + 56 >= scrollHeight && !loading && !dataComplete) {
+    if (
+      height + scrollY + 56 >= scrollHeight &&
+      !loading &&
+      !dataComplete &&
+      postsOffset !== 0
+    ) {
       fetchMore({ variables: { offset: postsOffset } });
     }
   }, [height, scrollY, scrollHeight]);
@@ -67,6 +99,56 @@ export const useGetPosts = (userId) => {
     }, 5000);
   };
 
+  const subscribeToNewPost = () => {
+    subscribeToMore({
+      document: ON_NEW_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return { getPosts: [] };
+        const newPost = subscriptionData.data.newPost;
+        return { getPosts: [newPost] };
+      },
+    });
+  };
+
+  const subscribeToEditPost = () => {
+    subscribeToMore({
+      document: ON_EDIT_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return { getPosts: [] };
+        const editedPost = subscriptionData.data.editedPost;
+
+        if (prev.getPosts.findIndex((pst) => pst.id === editedPost.id) === -1)
+          return prev;
+
+        return { getPosts: [editedPost] };
+      },
+    });
+  };
+
+  const subscribeToDeletePost = () => {
+    subscribeToMore({
+      document: ON_DEL_POST,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (subscriptionData) {
+          const postId = subscriptionData.data.deletedPost;
+          let postKey;
+          for (let key in client.cache.data.data) {
+            if (client.cache.data.data[key].id === postId) postKey = key;
+          }
+          client.cache.data.delete(postKey);
+        }
+
+        return { getPosts: [] };
+      },
+    });
+  };
+
+  useEffect(() => {
+    subscribeToNewPost();
+    subscribeToEditPost();
+    subscribeToDeletePost();
+  }, []);
+
   return {
     isAuth: !!token,
     error,
@@ -74,5 +156,26 @@ export const useGetPosts = (userId) => {
     setError: setErrorHandler,
     posts,
     dataComplete,
+    refetch,
   };
+};
+
+export const useErrorHandler = () => {
+  const { addMessage } = useContext(MessageContext);
+
+  const errorHandler = ({ networkError, graphQLErrors }) => {
+    let error =
+      "Unexpected issue occured, please try again later or contact Admin.";
+    if (networkError) {
+      console.log(networkError);
+    }
+
+    if (graphQLErrors && graphQLErrors[0]) {
+      error = graphQLErrors[0].message;
+    }
+
+    addMessage(error, "Error", "negative");
+  };
+
+  return { errorHandler };
 };
